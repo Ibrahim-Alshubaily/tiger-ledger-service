@@ -1,9 +1,41 @@
-version: '3.8'
+version: "3.8"
 
 services:
   tiger-ledger-service:
-    build: .
+    build:
+      context: .
+      dockerfile: docker/server/Dockerfile
     container_name: tiger-ledger-service
     ports:
       - "8080:8080"
+    depends_on:
+      tigerbeetle:
+        condition: service_healthy
+    environment:
+      - TIGER_BEETLE_CLUSTER=0
+      - TIGER_BEETLE_HOST=tigerbeetle
+      - TIGER_BEETLE_PORT=3000
     restart: unless-stopped
+
+  tigerbeetle:
+    build:
+      context: ./docker/tigerbeetle
+    container_name: tigerbeetle
+    ports:
+      - "3000:3000"
+    volumes:
+      - tigerbeetle-data:/data
+    security_opt:
+      - "seccomp=unconfined"
+    cap_add:
+      - IPC_LOCK
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "/tigerbeetle", "version" ]
+      interval: 5s
+      retries: 5
+      start_period: 5s
+      timeout: 3s
+
+volumes:
+  tigerbeetle-data:

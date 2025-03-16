@@ -2,11 +2,11 @@ FROM eclipse-temurin:17-jdk AS builder
 
 WORKDIR /app
 
-COPY gradle gradle
-COPY build.gradle settings.gradle gradlew ./
+COPY ../../gradle gradle
+COPY ../../build.gradle settings.gradle gradlew ./
 RUN ./gradlew dependencies --no-daemon
 
-COPY . .
+COPY ../.. .
 
 RUN ./gradlew clean build -x test --no-daemon
 
