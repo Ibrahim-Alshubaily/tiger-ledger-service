@@ -24,4 +24,17 @@ public class AccountController {
     public AccountBatch getAccount(@PathVariable long accountId) throws RequestException {
         return accountService.getAccount(accountId);
     }
+
+    @GetMapping("/{accountId}/balance")
+    public String getAccountBalance(@PathVariable long accountId) throws RequestException {
+        return accountService.getAccountBalance(accountId);
+    }
+
+    @PostMapping("/transfer")
+    public boolean transfer(
+            @RequestParam long debitAccountId,
+            @RequestParam long creditAccountId,
+            @RequestParam double amount) throws RequestException {
+        return accountService.transfer(debitAccountId, creditAccountId, amount);
+    }
 }
