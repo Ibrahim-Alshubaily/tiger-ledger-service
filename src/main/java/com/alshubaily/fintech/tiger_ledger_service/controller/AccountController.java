@@ -13,11 +13,8 @@ public class AccountController {
     private final AccountService accountService;
 
     @PostMapping
-    public boolean createAccount(
-            @RequestParam long accountId,
-            @RequestParam int ledger,
-            @RequestParam int code) throws RequestException {
-        return accountService.createAccount(accountId, ledger, code);
+    public boolean createAccount(@RequestParam long accountId) throws RequestException {
+        return accountService.createAccount(accountId);
     }
 
     @GetMapping("/{accountId}")
@@ -36,5 +33,19 @@ public class AccountController {
             @RequestParam long creditAccountId,
             @RequestParam double amount) throws RequestException {
         return accountService.transfer(debitAccountId, creditAccountId, amount);
+    }
+
+    @PostMapping("/deposit")
+    public boolean deposit(
+            @RequestParam long accountId,
+            @RequestParam double amount) throws RequestException {
+        return accountService.deposit(accountId, amount);
+    }
+
+    @PostMapping("/withdraw")
+    public boolean withdraw(
+            @RequestParam long accountId,
+            @RequestParam double amount) throws RequestException {
+        return accountService.withdraw(accountId, amount);
     }
 }
