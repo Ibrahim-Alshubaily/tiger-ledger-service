@@ -61,7 +61,7 @@ public class AccountService {
         long amountHalala = CurrencyUtil.sarToHalala(amountSar);
         TransferBatch transfers = new TransferBatch(1);
         transfers.add();
-        transfers.setId(UInt128.asBytes(System.nanoTime()));
+        transfers.setId(UInt128.id());
         transfers.setDebitAccountId(UInt128.asBytes(debitAccountId));
         transfers.setCreditAccountId(UInt128.asBytes(creditAccountId));
         transfers.setAmount(amountHalala);
