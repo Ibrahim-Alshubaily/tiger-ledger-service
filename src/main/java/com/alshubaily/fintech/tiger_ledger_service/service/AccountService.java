@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import java.text.NumberFormat;
 import java.util.Locale;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 public class AccountService {
@@ -56,7 +57,8 @@ public class AccountService {
         return currencyFormat.format(balanceSar);
     }
 
-    public boolean transfer(long debitAccountId, long creditAccountId, double amountSar) throws RequestException {
+
+    public CompletableFuture<Boolean> transfer(long debitAccountId, long creditAccountId, double amountSar) {
 
         long amountHalala = CurrencyUtil.sarToHalala(amountSar);
         TransferBatch transfers = new TransferBatch(1);
@@ -69,14 +71,19 @@ public class AccountService {
         transfers.setCode(CODE);
         transfers.setFlags(TransferFlags.NONE);
 
-        return client.createTransfers(transfers).getLength() == 0;
+        return client.createTransfersAsync(transfers)
+                .thenApply(response -> response.getLength() == 0)
+                .exceptionally(e -> {
+                    System.err.println("Transfer failed: " + e.getMessage());
+                    return false;
+                });
     }
 
-    public boolean deposit(long accountId, double amountSar) throws RequestException {
+    public CompletableFuture<Boolean> deposit(long accountId, double amountSar) {
         return transfer(CASH_ACCOUNT_ID, accountId, amountSar);
     }
 
-    public boolean withdraw(long accountId, double amountSar) throws RequestException {
+    public CompletableFuture<Boolean> withdraw(long accountId, double amountSar) {
         return transfer(accountId, CASH_ACCOUNT_ID, amountSar);
     }
 }

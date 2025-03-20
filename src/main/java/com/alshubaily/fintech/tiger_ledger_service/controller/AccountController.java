@@ -3,7 +3,10 @@ package com.alshubaily.fintech.tiger_ledger_service.controller;
 import com.tigerbeetle.*;
 import com.alshubaily.fintech.tiger_ledger_service.service.AccountService;
 import lombok.AllArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping("/api/accounts")
@@ -28,24 +31,30 @@ public class AccountController {
     }
 
     @PostMapping("/transfer")
-    public boolean transfer(
+    public CompletableFuture<ResponseEntity<Boolean>> transfer(
             @RequestParam long debitAccountId,
             @RequestParam long creditAccountId,
-            @RequestParam double amount) throws RequestException {
-        return accountService.transfer(debitAccountId, creditAccountId, amount);
+            @RequestParam double amount) {
+
+        return accountService.transfer(debitAccountId, creditAccountId, amount)
+                .thenApply(ResponseEntity::ok);
     }
 
     @PostMapping("/deposit")
-    public boolean deposit(
+    public CompletableFuture<ResponseEntity<Boolean>> deposit(
             @RequestParam long accountId,
-            @RequestParam double amount) throws RequestException {
-        return accountService.deposit(accountId, amount);
+            @RequestParam double amount) {
+
+        return accountService.deposit(accountId, amount)
+                .thenApply(ResponseEntity::ok);
     }
 
     @PostMapping("/withdraw")
-    public boolean withdraw(
+    public CompletableFuture<ResponseEntity<Boolean>> withdraw(
             @RequestParam long accountId,
-            @RequestParam double amount) throws RequestException {
-        return accountService.withdraw(accountId, amount);
+            @RequestParam double amount) {
+
+        return accountService.withdraw(accountId, amount)
+                .thenApply(ResponseEntity::ok);
     }
 }
