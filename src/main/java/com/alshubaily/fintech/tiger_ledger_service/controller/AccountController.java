@@ -1,11 +1,13 @@
 package com.alshubaily.fintech.tiger_ledger_service.controller;
 
+import com.alshubaily.fintech.tiger_ledger_service.model.Transaction;
 import com.tigerbeetle.*;
 import com.alshubaily.fintech.tiger_ledger_service.service.AccountService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 @RestController
@@ -56,5 +58,11 @@ public class AccountController {
 
         return accountService.withdraw(accountId, amount)
                 .thenApply(ResponseEntity::ok);
+    }
+
+    @GetMapping("/{accountId}/transactions")
+    public ResponseEntity<List<Transaction>> getTransactionHistory(
+            @PathVariable long accountId) {
+        return ResponseEntity.ok(accountService.getTransactionHistory(accountId));
     }
 }

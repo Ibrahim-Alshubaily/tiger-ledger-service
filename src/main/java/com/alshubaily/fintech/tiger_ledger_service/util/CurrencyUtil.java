@@ -1,6 +1,7 @@
 package com.alshubaily.fintech.tiger_ledger_service.util;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.RoundingMode;
 
 public class CurrencyUtil {
@@ -18,4 +19,11 @@ public class CurrencyUtil {
                 .divide(BigDecimal.valueOf(HALALA_PER_SAR), 2, RoundingMode.HALF_UP)
                 .doubleValue();
     }
+
+    public static double halalaToSar(BigInteger halalaAmount) {
+        return new BigDecimal(halalaAmount)
+                .divide(BigDecimal.valueOf(HALALA_PER_SAR), 2, RoundingMode.HALF_UP)
+                .doubleValue();
+    }
+
 }

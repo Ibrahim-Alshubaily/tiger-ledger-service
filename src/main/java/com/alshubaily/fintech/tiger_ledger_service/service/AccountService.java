@@ -1,10 +1,15 @@
 package com.alshubaily.fintech.tiger_ledger_service.service;
 
+import com.alshubaily.fintech.tiger_ledger_service.model.Transaction;
+import com.alshubaily.fintech.tiger_ledger_service.util.AccountUtil;
 import com.alshubaily.fintech.tiger_ledger_service.util.CurrencyUtil;
 import com.tigerbeetle.*;
 import org.springframework.stereotype.Service;
 
 import java.text.NumberFormat;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 
@@ -86,4 +91,26 @@ public class AccountService {
     public CompletableFuture<Boolean> withdraw(long accountId, double amountSar) {
         return transfer(accountId, CASH_ACCOUNT_ID, amountSar);
     }
+
+    public List<Transaction> getTransactionHistory(long accountId) {
+        AccountFilter filter = new AccountFilter();
+        filter.setAccountId(accountId);
+        filter.setLimit(10); // TODO: Pagination
+        filter.setDebits(true);
+        filter.setCredits(true);
+
+        TransferBatch tb = client.getAccountTransfers(filter);
+        List<Transaction> resp = new ArrayList<>();
+        while (tb.next()) {
+            resp.add(new Transaction(
+                    AccountUtil.toLong(tb.getDebitAccountId()),
+                    AccountUtil.toLong(tb.getCreditAccountId()),
+                    CurrencyUtil.halalaToSar(tb.getAmount()),
+                    Instant.ofEpochSecond(0, tb.getTimestamp())
+                    ));
+        }
+        return resp;
+    }
 }
+
+
