@@ -11,6 +11,8 @@ services:
     depends_on:
       tigerbeetle:
         condition: service_healthy
+      postgres:
+        condition: service_healthy
     environment:
       - TIGER_BEETLE_CLUSTER=0
       - TIGER_BEETLE_HOST=tigerbeetle
@@ -36,6 +38,22 @@ services:
       retries: 5
       start_period: 5s
       timeout: 3s
+
+  postgres:
+    image: postgres:15
+    container_name: tiger-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: tigerledger
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 volumes:
   tigerbeetle-data:
