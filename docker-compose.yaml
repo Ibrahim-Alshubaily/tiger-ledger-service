@@ -7,7 +7,7 @@ services:
       dockerfile: docker/server/Dockerfile
     container_name: tiger-ledger-service
     ports:
-      - "8080:8080"
+      - "8443:8443"
     depends_on:
       tigerbeetle:
         condition: service_healthy
