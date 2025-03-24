@@ -1,6 +1,9 @@
 package com.alshubaily.fintech.tiger_ledger_service.service;
 
 import com.alshubaily.fintech.tiger_ledger_service.model.Transaction;
+import com.alshubaily.fintech.tiger_ledger_service.model.account.request.DepositRequest;
+import com.alshubaily.fintech.tiger_ledger_service.model.account.request.TransferRequest;
+import com.alshubaily.fintech.tiger_ledger_service.model.account.request.WithdrawRequest;
 import com.alshubaily.fintech.tiger_ledger_service.util.AccountUtil;
 import com.alshubaily.fintech.tiger_ledger_service.util.CurrencyUtil;
 import com.tigerbeetle.*;
@@ -84,12 +87,16 @@ public class AccountService {
                 });
     }
 
-    public CompletableFuture<Boolean> deposit(long accountId, double amountSar) {
-        return transfer(CASH_ACCOUNT_ID, accountId, amountSar);
+    public CompletableFuture<Boolean> transfer(TransferRequest request) {
+        return transfer(request.debitAccountId(), request.creditAccountId(), request.amount());
     }
 
-    public CompletableFuture<Boolean> withdraw(long accountId, double amountSar) {
-        return transfer(accountId, CASH_ACCOUNT_ID, amountSar);
+    public CompletableFuture<Boolean> deposit(DepositRequest request) {
+        return transfer(CASH_ACCOUNT_ID, request.accountId(), request.amount());
+    }
+
+    public CompletableFuture<Boolean> withdraw(WithdrawRequest request) {
+        return transfer(request.accountId(), CASH_ACCOUNT_ID, request.amount());
     }
 
     public List<Transaction> getTransactionHistory(long accountId) {
