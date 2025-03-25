@@ -30,6 +30,11 @@ public class AccountController {
         return ResponseEntity.ok(accountService.createAccount());
     }
 
+    @GetMapping
+    public ResponseEntity<List<GetAccountResponse>> getAccounts() {
+        return ResponseEntity.ok(accountService.getAccounts());
+    }
+
     @GetMapping("/{accountId}")
     public AccountBatch getAccount(@PathVariable @Min(1) BigInteger accountId) throws RequestException {
         return accountService.getAccount(accountId);

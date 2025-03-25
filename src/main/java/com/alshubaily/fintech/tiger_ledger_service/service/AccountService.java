@@ -9,6 +9,7 @@ import com.alshubaily.fintech.tiger_ledger_service.model.account.request.Deposit
 import com.alshubaily.fintech.tiger_ledger_service.model.account.request.TransferRequest;
 import com.alshubaily.fintech.tiger_ledger_service.model.account.request.WithdrawRequest;
 import com.alshubaily.fintech.tiger_ledger_service.model.account.response.CreateAccountResponse;
+import com.alshubaily.fintech.tiger_ledger_service.model.account.response.GetAccountResponse;
 import com.alshubaily.fintech.tiger_ledger_service.util.AccountUtil;
 import com.alshubaily.fintech.tiger_ledger_service.util.CurrencyUtil;
 import com.alshubaily.fintech.tiger_ledger_service.util.SecurityUtil;
@@ -55,13 +56,13 @@ public class AccountService {
                 .orElseThrow(() -> new IllegalStateException("User not found: " + userId));
 
         Account account = new Account();
-        account.setAccountId(new BigInteger(1, accountId));
+        account.setAccountId(UInt128.asBigInteger(accountId));
         account.setOwner(user);
         accountRepository.save(account);
         return new CreateAccountResponse(account.getAccountId());
     }
 
-    private CreateAccountResultBatch createAccount(byte[] accountId, long userId) throws Exception {
+    private CreateAccountResultBatch createAccount(byte[] accountId, long userId) {
         AccountBatch accounts = new AccountBatch(1);
         accounts.add();
         accounts.setId(accountId);
@@ -72,22 +73,33 @@ public class AccountService {
         return client.createAccounts(accounts);
     }
 
-    public AccountBatch getAccount(BigInteger accountId) throws RequestException {
-        IdBatch idBatch = new IdBatch(1);
-        idBatch.add(accountId.toByteArray());
-        AccountBatch accounts = client.lookupAccounts(idBatch);
-        if (accounts.getLength() == 0) {
-            return null;
+    public List<GetAccountResponse> getAccounts() {
+        long userId = SecurityUtil.getAuthenticatedUserId();
+        return accountRepository.findAllByOwnerId(userId).stream()
+                .map(acc -> new GetAccountResponse(acc.getAccountId()))
+                .toList();
+    }
+
+    public AccountBatch getAccount(BigInteger accountId) {
+        try {
+            IdBatch idBatch = new IdBatch(1);
+            idBatch.add(UInt128.asBytes(accountId));
+            AccountBatch batch = client.lookupAccounts(idBatch);
+
+            if (batch.getLength() == 0) {
+                throw new IllegalArgumentException("Account not found");
+            }
+
+            batch.next();
+            return batch;
+
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Failed to get account: " + e.getMessage(), e);
         }
-        accounts.next();
-        return accounts;
     }
 
     public String getAccountBalance(BigInteger accountId) throws RequestException {
         AccountBatch account = getAccount(accountId);
-        if (account == null) {
-            throw new IllegalArgumentException("Account not found");
-        }
 
         long balanceHalala = account.getCreditsPosted().longValue() - account.getDebitsPosted().longValue();
         double balanceSar = CurrencyUtil.halalaToSar(balanceHalala);
