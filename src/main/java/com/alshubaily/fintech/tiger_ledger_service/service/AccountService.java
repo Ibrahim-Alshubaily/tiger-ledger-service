@@ -80,34 +80,40 @@ public class AccountService {
                 .toList();
     }
 
-    public AccountBatch getAccount(BigInteger accountId) {
+    public GetAccountResponse getAccountDetails(BigInteger accountId) {
         try {
+            Account account = accountRepository.findByAccountId(accountId)
+                    .orElseThrow(() -> new IllegalArgumentException("Account not found in DB: " + accountId));
+
+            User user = account.getOwner();
+            Instant createdAt = account.getCreatedAt();
+
             IdBatch idBatch = new IdBatch(1);
             idBatch.add(UInt128.asBytes(accountId));
             AccountBatch batch = client.lookupAccounts(idBatch);
 
             if (batch.getLength() == 0) {
-                throw new IllegalArgumentException("Account not found");
+                throw new IllegalArgumentException("Account not found in TigerBeetle: " + accountId);
             }
 
             batch.next();
-            return batch;
+            long balanceHalala = batch.getCreditsPosted().longValue() - batch.getDebitsPosted().longValue();
+            double balanceSar = CurrencyUtil.halalaToSar(balanceHalala);
+            NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(new Locale("ar", "SA"));
+            String balanceFormatted =  currencyFormat.format(balanceSar);
+            return new GetAccountResponse(
+                    accountId,
+                    balanceFormatted,
+                    balanceSar,
+                    createdAt,
+                    user.getId(),
+                    user.getUsername()
+            );
 
         } catch (Exception e) {
             throw new IllegalArgumentException("Failed to get account: " + e.getMessage(), e);
         }
     }
-
-    public String getAccountBalance(BigInteger accountId) throws RequestException {
-        AccountBatch account = getAccount(accountId);
-
-        long balanceHalala = account.getCreditsPosted().longValue() - account.getDebitsPosted().longValue();
-        double balanceSar = CurrencyUtil.halalaToSar(balanceHalala);
-
-        NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(new Locale("ar", "SA"));
-        return currencyFormat.format(balanceSar);
-    }
-
 
     public CompletableFuture<Boolean> transfer(long debitAccountId, long creditAccountId, double amountSar) {
 

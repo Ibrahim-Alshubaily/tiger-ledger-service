@@ -36,13 +36,8 @@ public class AccountController {
     }
 
     @GetMapping("/{accountId}")
-    public AccountBatch getAccount(@PathVariable @Min(1) BigInteger accountId) throws RequestException {
-        return accountService.getAccount(accountId);
-    }
-
-    @GetMapping("/{accountId}/balance")
-    public String getAccountBalance(@PathVariable @Min(1) BigInteger accountId) throws RequestException {
-        return accountService.getAccountBalance(accountId);
+    public ResponseEntity<GetAccountResponse> getAccount(@PathVariable @Min(1) BigInteger accountId) throws RequestException {
+        return ResponseEntity.ok(accountService.getAccountDetails(accountId));
     }
 
     @PostMapping("/transfer")
