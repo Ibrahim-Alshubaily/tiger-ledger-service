@@ -10,6 +10,7 @@ import com.alshubaily.fintech.tiger_ledger_service.model.account.request.Transfe
 import com.alshubaily.fintech.tiger_ledger_service.model.account.request.WithdrawRequest;
 import com.alshubaily.fintech.tiger_ledger_service.model.account.response.CreateAccountResponse;
 import com.alshubaily.fintech.tiger_ledger_service.model.account.response.GetAccountResponse;
+import com.alshubaily.fintech.tiger_ledger_service.model.account.response.TransferResponse;
 import com.alshubaily.fintech.tiger_ledger_service.util.AccountUtil;
 import com.alshubaily.fintech.tiger_ledger_service.util.CurrencyUtil;
 import com.alshubaily.fintech.tiger_ledger_service.util.SecurityUtil;
@@ -28,7 +29,7 @@ import java.util.concurrent.CompletableFuture;
 public class AccountService {
 
     private final Client client;
-    private static final long CASH_ACCOUNT_ID = Long.MAX_VALUE;
+    private static final BigInteger CASH_ACCOUNT_ID = BigInteger.valueOf(Long.MAX_VALUE);
     private static final int LEDGER = 1;
     private static final int CODE = 1;
     private final UserRepository userRepository;
@@ -115,12 +116,13 @@ public class AccountService {
         }
     }
 
-    public CompletableFuture<Boolean> transfer(long debitAccountId, long creditAccountId, double amountSar) {
-
+    private TransferResponse transfer(BigInteger debitAccountId, BigInteger creditAccountId, double amountSar) {
         long amountHalala = CurrencyUtil.sarToHalala(amountSar);
+        byte[] transactionIdBytes = UInt128.id();
+
         TransferBatch transfers = new TransferBatch(1);
         transfers.add();
-        transfers.setId(UInt128.id());
+        transfers.setId(transactionIdBytes);
         transfers.setDebitAccountId(UInt128.asBytes(debitAccountId));
         transfers.setCreditAccountId(UInt128.asBytes(creditAccountId));
         transfers.setAmount(amountHalala);
@@ -128,23 +130,28 @@ public class AccountService {
         transfers.setCode(CODE);
         transfers.setFlags(TransferFlags.NONE);
 
-        return client.createTransfersAsync(transfers)
-                .thenApply(response -> response.getLength() == 0)
-                .exceptionally(e -> {
-                    System.err.println("Transfer failed: " + e.getMessage());
-                    return false;
-                });
+        CreateTransferResultBatch result = client.createTransfers(transfers);
+
+        if (result.getLength() > 0) {
+            result.next();
+            throw new IllegalStateException("Transfer rejected by TigerBeetle: " + result.getResult());
+        }
+
+        return new TransferResponse(
+                UInt128.asBigInteger(transactionIdBytes).toString(),
+                Instant.now()
+        );
     }
 
-    public CompletableFuture<Boolean> transfer(TransferRequest request) {
+    public TransferResponse transfer(TransferRequest request) {
         return transfer(request.debitAccountId(), request.creditAccountId(), request.amount());
     }
 
-    public CompletableFuture<Boolean> deposit(DepositRequest request) {
+    public TransferResponse deposit(DepositRequest request) {
         return transfer(CASH_ACCOUNT_ID, request.accountId(), request.amount());
     }
 
-    public CompletableFuture<Boolean> withdraw(WithdrawRequest request) {
+    public TransferResponse withdraw(WithdrawRequest request) {
         return transfer(request.accountId(), CASH_ACCOUNT_ID, request.amount());
     }
 

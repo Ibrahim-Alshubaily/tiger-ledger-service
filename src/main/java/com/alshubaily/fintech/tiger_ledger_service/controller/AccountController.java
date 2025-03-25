@@ -15,7 +15,6 @@ import jakarta.validation.constraints.Min;
 
 import java.math.BigInteger;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping("/api/accounts")
@@ -41,21 +40,20 @@ public class AccountController {
     }
 
     @PostMapping("/transfer")
-    public CompletableFuture<ResponseEntity<Boolean>> transfer(@Valid @RequestBody TransferRequest request) {
-        return accountService.transfer(request)
-                .thenApply(ResponseEntity::ok);
+    public ResponseEntity<TransferResponse> transfer(@Valid @RequestBody TransferRequest request) {
+        return ResponseEntity.ok(accountService.transfer(request));
     }
 
     @PostMapping("/deposit")
-    public CompletableFuture<ResponseEntity<Boolean>> deposit(@Valid @RequestBody DepositRequest request) {
-        return accountService.deposit(request)
-                .thenApply(ResponseEntity::ok);
+    public ResponseEntity<TransferResponse> deposit(@Valid @RequestBody DepositRequest request) {
+        return ResponseEntity.ok(accountService.deposit(request));
+
     }
 
     @PostMapping("/withdraw")
-    public CompletableFuture<ResponseEntity<Boolean>> withdraw(@Valid @RequestBody WithdrawRequest request) {
-        return accountService.withdraw(request)
-                .thenApply(ResponseEntity::ok);
+    public ResponseEntity<TransferResponse> withdraw(@Valid @RequestBody WithdrawRequest request) {
+        return ResponseEntity.ok(accountService.withdraw(request));
+
     }
 
     @GetMapping("/{accountId}/transactions")
