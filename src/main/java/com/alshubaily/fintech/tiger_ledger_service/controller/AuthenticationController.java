@@ -3,23 +3,23 @@ package com.alshubaily.fintech.tiger_ledger_service.controller;
 import com.alshubaily.fintech.tiger_ledger_service.model.Auth.LoginRequest;
 import com.alshubaily.fintech.tiger_ledger_service.model.Auth.LoginResponse;
 import com.alshubaily.fintech.tiger_ledger_service.model.Auth.SignupRequest;
-import com.alshubaily.fintech.tiger_ledger_service.service.AuthService;
+import com.alshubaily.fintech.tiger_ledger_service.service.AuthenticationService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api")
 @AllArgsConstructor
-public class AuthController {
+public class AuthenticationController {
 
-    private final AuthService authService;
+    private final AuthenticationService authenticationService;
     @PostMapping("/signup")
     public Long signUp(@RequestBody SignupRequest signupRequest) {
-        return authService.signup(signupRequest);
+        return authenticationService.signup(signupRequest);
     }
 
     @PostMapping("/login")
     public LoginResponse login(@RequestBody LoginRequest loginRequest) {
-        return authService.login(loginRequest);
+        return authenticationService.login(loginRequest);
     }
 }

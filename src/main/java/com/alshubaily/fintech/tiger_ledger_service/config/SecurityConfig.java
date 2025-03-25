@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
@@ -27,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 @Configuration
+@EnableMethodSecurity
 public class SecurityConfig {
 
     @Autowired
@@ -57,7 +59,6 @@ public class SecurityConfig {
         @Override
         protected boolean shouldNotFilter(HttpServletRequest request) {
             String path = request.getRequestURI();
-            System.out.println("shouldNotFilter() path = " + path);
             return path.equals("/api/login") || path.equals("/api/signup") || path.equals("/api/health");
         }
 
@@ -66,8 +67,6 @@ public class SecurityConfig {
                                         HttpServletResponse response,
                                         FilterChain filterChain)
                 throws ServletException, IOException {
-
-            System.out.println("JwtAuthFilter triggered for: " + request.getRequestURI());
 
             String header = request.getHeader("Authorization");
             if (header == null || !header.startsWith("Bearer ")) {

@@ -8,29 +8,27 @@ import com.alshubaily.fintech.tiger_ledger_service.model.Auth.SignupRequest;
 import com.alshubaily.fintech.tiger_ledger_service.util.JwtUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 
 @Service
 @AllArgsConstructor
-public class AuthService {
+public class AuthenticationService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-    @Autowired
     private final JwtUtil jwtUtil;
 
     public long signup(SignupRequest request) {
         if (userRepository.existsByUsername(request.getUsername())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists");
+            throw new IllegalArgumentException("Username already exists");
         }
 
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already in use");
+            throw new IllegalArgumentException("Email already in use");
         }
 
         User user = new User();
@@ -52,11 +50,11 @@ public class AuthService {
         }
 
         User user = optionalUser.orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials")
+                new AccessDeniedException("Invalid credentials")
         );
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
+            throw new AccessDeniedException("Invalid credentials");
         }
 
         return new LoginResponse(jwtUtil.generateToken(user));
