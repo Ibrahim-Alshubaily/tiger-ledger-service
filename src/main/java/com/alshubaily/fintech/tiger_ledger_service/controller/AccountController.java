@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 
+import java.math.BigInteger;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -25,17 +26,17 @@ public class AccountController {
     private final AccountService accountService;
 
     @PostMapping
-    public ResponseEntity<CreateAccountResponse> createAccount() {
+    public ResponseEntity<CreateAccountResponse> createAccount() throws Exception {
         return ResponseEntity.ok(accountService.createAccount());
     }
 
     @GetMapping("/{accountId}")
-    public AccountBatch getAccount(@PathVariable @Min(1) long accountId) throws RequestException {
+    public AccountBatch getAccount(@PathVariable @Min(1) BigInteger accountId) throws RequestException {
         return accountService.getAccount(accountId);
     }
 
     @GetMapping("/{accountId}/balance")
-    public String getAccountBalance(@PathVariable @Min(1) long accountId) throws RequestException {
+    public String getAccountBalance(@PathVariable @Min(1) BigInteger accountId) throws RequestException {
         return accountService.getAccountBalance(accountId);
     }
 

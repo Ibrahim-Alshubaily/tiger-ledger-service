@@ -80,7 +80,7 @@ public class SecurityConfig {
                 Claims claims = jwtUtil.validateToken(token);
                 String username = claims.getSubject();
 
-                Authentication auth = new UsernamePasswordAuthenticationToken(username, null, List.of());
+                Authentication auth = new UsernamePasswordAuthenticationToken(username, claims, List.of());
                 SecurityContextHolder.getContext().setAuthentication(auth);
             } catch (Exception e) {
                 respondUnauthorized(response, "Invalid or expired token");

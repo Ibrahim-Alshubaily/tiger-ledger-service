@@ -24,7 +24,7 @@ public class AuthService {
     @Autowired
     private final JwtUtil jwtUtil;
 
-    public Long signup(SignupRequest request) {
+    public long signup(SignupRequest request) {
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists");
         }

@@ -1,5 +1,9 @@
 package com.alshubaily.fintech.tiger_ledger_service.service;
 
+import com.alshubaily.fintech.tiger_ledger_service.db.account.Account;
+import com.alshubaily.fintech.tiger_ledger_service.db.account.AccountRepository;
+import com.alshubaily.fintech.tiger_ledger_service.db.user.User;
+import com.alshubaily.fintech.tiger_ledger_service.db.user.UserRepository;
 import com.alshubaily.fintech.tiger_ledger_service.model.Transaction;
 import com.alshubaily.fintech.tiger_ledger_service.model.account.request.DepositRequest;
 import com.alshubaily.fintech.tiger_ledger_service.model.account.request.TransferRequest;
@@ -7,10 +11,11 @@ import com.alshubaily.fintech.tiger_ledger_service.model.account.request.Withdra
 import com.alshubaily.fintech.tiger_ledger_service.model.account.response.CreateAccountResponse;
 import com.alshubaily.fintech.tiger_ledger_service.util.AccountUtil;
 import com.alshubaily.fintech.tiger_ledger_service.util.CurrencyUtil;
+import com.alshubaily.fintech.tiger_ledger_service.util.SecurityUtil;
 import com.tigerbeetle.*;
 import org.springframework.stereotype.Service;
 
-import java.nio.ByteBuffer;
+import java.math.BigInteger;
 import java.text.NumberFormat;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -25,34 +30,51 @@ public class AccountService {
     private static final long CASH_ACCOUNT_ID = Long.MAX_VALUE;
     private static final int LEDGER = 1;
     private static final int CODE = 1;
+    private final UserRepository userRepository;
+    private final AccountRepository accountRepository;
 
-    public AccountService(Client client) throws RequestException {
+
+    public AccountService(Client client, UserRepository userRepository, AccountRepository accountRepository) throws Exception {
         this.client = client;
-        createAccount(UInt128.asBytes(CASH_ACCOUNT_ID));
+        this.userRepository = userRepository;
+        this.accountRepository = accountRepository;
+
+        createAccount(UInt128.asBytes(CASH_ACCOUNT_ID), 0L);
     }
 
-    public CreateAccountResponse createAccount() {
-        byte[] id = UInt128.id();
-        createAccount(id);
-        return new CreateAccountResponse(ByteBuffer.wrap(id).getLong());
+    public CreateAccountResponse createAccount() throws Exception {
+        byte[] accountId = UInt128.id();
+        long userId = SecurityUtil.getAuthenticatedUserId();
+
+        CreateAccountResultBatch errors = createAccount(accountId, userId);
+        if (errors.next()) {
+            throw new Exception("Failed to create account: " + errors.getResult());
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalStateException("User not found: " + userId));
+
+        Account account = new Account();
+        account.setAccountId(new BigInteger(1, accountId));
+        account.setOwner(user);
+        accountRepository.save(account);
+        return new CreateAccountResponse(account.getAccountId());
     }
-    private void createAccount(byte[] accountId) throws RequestException {
+
+    private CreateAccountResultBatch createAccount(byte[] accountId, long userId) throws Exception {
         AccountBatch accounts = new AccountBatch(1);
         accounts.add();
         accounts.setId(accountId);
         accounts.setLedger(LEDGER);
         accounts.setCode(CODE);
         accounts.setFlags(AccountFlags.NONE);
-        CreateAccountResultBatch errors = client.createAccounts(accounts);
-        if (errors.next()) {
-            throw new RuntimeException("Failed to create account: "+ errors.getResult());
-        }
+        accounts.setUserData64(userId);
+        return client.createAccounts(accounts);
     }
 
-    public AccountBatch getAccount(long accountId) throws RequestException {
+    public AccountBatch getAccount(BigInteger accountId) throws RequestException {
         IdBatch idBatch = new IdBatch(1);
-        idBatch.add(UInt128.asBytes(accountId));
-
+        idBatch.add(accountId.toByteArray());
         AccountBatch accounts = client.lookupAccounts(idBatch);
         if (accounts.getLength() == 0) {
             return null;
@@ -61,7 +83,7 @@ public class AccountService {
         return accounts;
     }
 
-    public String getAccountBalance(long accountId) throws RequestException {
+    public String getAccountBalance(BigInteger accountId) throws RequestException {
         AccountBatch account = getAccount(accountId);
         if (account == null) {
             throw new IllegalArgumentException("Account not found");
