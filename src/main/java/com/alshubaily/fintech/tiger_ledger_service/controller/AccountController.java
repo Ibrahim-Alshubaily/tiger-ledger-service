@@ -3,6 +3,7 @@ package com.alshubaily.fintech.tiger_ledger_service.controller;
 import com.alshubaily.fintech.tiger_ledger_service.model.Transaction;
 
 import com.alshubaily.fintech.tiger_ledger_service.model.account.request.*;
+import com.alshubaily.fintech.tiger_ledger_service.model.account.response.*;
 import com.tigerbeetle.*;
 import com.alshubaily.fintech.tiger_ledger_service.service.AccountService;
 import lombok.AllArgsConstructor;
@@ -24,8 +25,8 @@ public class AccountController {
     private final AccountService accountService;
 
     @PostMapping
-    public boolean createAccount(@RequestParam @Min(1) long accountId) throws RequestException {
-        return accountService.createAccount(accountId);
+    public ResponseEntity<CreateAccountResponse> createAccount() {
+        return ResponseEntity.ok(accountService.createAccount());
     }
 
     @GetMapping("/{accountId}")

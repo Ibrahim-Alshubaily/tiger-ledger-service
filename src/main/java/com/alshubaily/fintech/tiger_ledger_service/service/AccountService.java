@@ -4,11 +4,13 @@ import com.alshubaily.fintech.tiger_ledger_service.model.Transaction;
 import com.alshubaily.fintech.tiger_ledger_service.model.account.request.DepositRequest;
 import com.alshubaily.fintech.tiger_ledger_service.model.account.request.TransferRequest;
 import com.alshubaily.fintech.tiger_ledger_service.model.account.request.WithdrawRequest;
+import com.alshubaily.fintech.tiger_ledger_service.model.account.response.CreateAccountResponse;
 import com.alshubaily.fintech.tiger_ledger_service.util.AccountUtil;
 import com.alshubaily.fintech.tiger_ledger_service.util.CurrencyUtil;
 import com.tigerbeetle.*;
 import org.springframework.stereotype.Service;
 
+import java.nio.ByteBuffer;
 import java.text.NumberFormat;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -26,18 +28,25 @@ public class AccountService {
 
     public AccountService(Client client) throws RequestException {
         this.client = client;
-        createAccount(CASH_ACCOUNT_ID);
+        createAccount(UInt128.asBytes(CASH_ACCOUNT_ID));
     }
 
-    public boolean createAccount(long accountId) throws RequestException {
+    public CreateAccountResponse createAccount() {
+        byte[] id = UInt128.id();
+        createAccount(id);
+        return new CreateAccountResponse(ByteBuffer.wrap(id).getLong());
+    }
+    private void createAccount(byte[] accountId) throws RequestException {
         AccountBatch accounts = new AccountBatch(1);
         accounts.add();
-        accounts.setId(UInt128.asBytes(accountId));
+        accounts.setId(accountId);
         accounts.setLedger(LEDGER);
         accounts.setCode(CODE);
         accounts.setFlags(AccountFlags.NONE);
-        CreateAccountResultBatch accountErrors = client.createAccounts(accounts);
-        return accountErrors.getLength() == 0;
+        CreateAccountResultBatch errors = client.createAccounts(accounts);
+        if (errors.next()) {
+            throw new RuntimeException("Failed to create account: "+ errors.getResult());
+        }
     }
 
     public AccountBatch getAccount(long accountId) throws RequestException {
