@@ -2,12 +2,12 @@ package com.alshubaily.fintech.tiger_ledger_service.service;
 
 import com.alshubaily.fintech.tiger_ledger_service.db.user.User;
 import com.alshubaily.fintech.tiger_ledger_service.db.user.UserRepository;
-import com.alshubaily.fintech.tiger_ledger_service.model.Auth.LoginRequest;
-import com.alshubaily.fintech.tiger_ledger_service.model.Auth.LoginResponse;
-import com.alshubaily.fintech.tiger_ledger_service.model.Auth.SignupRequest;
+import com.alshubaily.fintech.tiger_ledger_service.model.Auth.request.LoginRequest;
+import com.alshubaily.fintech.tiger_ledger_service.model.Auth.response.LoginResponse;
+import com.alshubaily.fintech.tiger_ledger_service.model.Auth.request.SignupRequest;
+import com.alshubaily.fintech.tiger_ledger_service.model.Auth.response.SignupResponse;
 import com.alshubaily.fintech.tiger_ledger_service.util.JwtUtil;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,7 +22,7 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private final JwtUtil jwtUtil;
 
-    public long signup(SignupRequest request) {
+    public SignupResponse signup(SignupRequest request) {
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new IllegalArgumentException("Username already exists");
         }
@@ -36,7 +36,7 @@ public class AuthenticationService {
         user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
         user.setEmail(request.getEmail());
 
-        return userRepository.save(user).getId();
+        return new SignupResponse(userRepository.save(user).getId());
     }
 
 
