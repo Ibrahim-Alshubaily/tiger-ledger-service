@@ -1,4 +1,4 @@
-package com.alshubaily.fintech.tiger_ledger_service.controller;
+package com.alshubaily.fintech.tiger_ledger_service.config;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

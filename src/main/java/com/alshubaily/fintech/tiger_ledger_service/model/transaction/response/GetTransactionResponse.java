@@ -1,8 +1,8 @@
-package com.alshubaily.fintech.tiger_ledger_service.model;
+package com.alshubaily.fintech.tiger_ledger_service.model.transaction.response;
 
 import java.time.Instant;
 
-public record Transaction(
+public record GetTransactionResponse(
         long debitAccount,
         long creditAccount,
         double amount,

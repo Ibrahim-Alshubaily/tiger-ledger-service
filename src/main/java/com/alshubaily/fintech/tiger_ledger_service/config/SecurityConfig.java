@@ -24,23 +24,28 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 @Configuration
+@AllArgsConstructor
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    @Autowired
     private JwtAuthFilter jwtAuthFilter;
+    private static final String[] PUBLIC_PATHS = {
+            "/api/v1/health",
+            "/api/v1/auth/signup",
+            "/api/v1/auth/login"
+    };
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.POST, "/api/login", "/api/signup").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/health").permitAll()
+                        .requestMatchers(PUBLIC_PATHS).permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -59,7 +64,7 @@ public class SecurityConfig {
         @Override
         protected boolean shouldNotFilter(HttpServletRequest request) {
             String path = request.getRequestURI();
-            return path.equals("/api/login") || path.equals("/api/signup") || path.equals("/api/health");
+            return Arrays.stream(PUBLIC_PATHS).anyMatch(path::equals);
         }
 
         @Override
