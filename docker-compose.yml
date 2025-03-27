@@ -1,11 +1,11 @@
-version: "3.8"
 
 services:
-  tiger-ledger-service:
+
+  tiger-ledger-server:
     build:
       context: .
       dockerfile: docker/server/Dockerfile
-    container_name: tiger-ledger-service
+    container_name: tiger-ledger-server
     ports:
       - "8443:8443"
     depends_on:
@@ -17,6 +17,8 @@ services:
       - TIGER_BEETLE_CLUSTER=0
       - TIGER_BEETLE_HOST=tigerbeetle
       - TIGER_BEETLE_PORT=3000
+    security_opt:
+      - seccomp=unconfined
     restart: unless-stopped
 
   tigerbeetle:
@@ -52,7 +54,7 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: [ "CMD", "pg_isready", "-U", "postgres" ]
+      test: ["CMD", "pg_isready", "-U", "postgres"]
       interval: 5s
       timeout: 5s
       retries: 5

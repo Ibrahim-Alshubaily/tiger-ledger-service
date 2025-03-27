@@ -18,6 +18,8 @@ configurations {
 	compileOnly {
 		extendsFrom annotationProcessor
 	}
+	integrationTestImplementation.extendsFrom testImplementation
+	integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
 }
 
 repositories {
@@ -44,33 +46,50 @@ dependencies {
 
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'com.h2database:h2'
+	testImplementation platform('org.junit:junit-bom:5.10.0')
+	testImplementation 'org.junit.jupiter:junit-jupiter-api'
+	testRuntimeOnly  'org.junit.jupiter:junit-jupiter-engine'
 
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	testImplementation 'org.apache.httpcomponents.client5:httpclient5:5.2.1'
+	testImplementation 'org.assertj:assertj-core:3.24.2'
 
-	testImplementation 'org.openjdk.jmh:jmh-core:1.36'
-	testAnnotationProcessor 'org.openjdk.jmh:jmh-generator-annprocess:1.36'
+
+//	testImplementation 'org.openjdk.jmh:jmh-core:1.36'
+//	testAnnotationProcessor 'org.openjdk.jmh:jmh-generator-annprocess:1.36'
+
 }
 
-tasks.named('test') {
+sourceSets {
+	integrationTest {
+		java.srcDir 'src/test/java' // Using src/test/java for simplicity
+		resources.srcDir 'src/test/resources'
+		compileClasspath += sourceSets.test.output
+		runtimeClasspath += sourceSets.test.output
+	}
+}
+
+tasks.register('e2eTest', Test) {
+	group = 'verification'
+	description = 'Runs the E2E tests.'
 	useJUnitPlatform()
+	testClassesDirs = sourceSets.integrationTest.output.classesDirs
+	classpath = sourceSets.integrationTest.runtimeClasspath
 }
 
-tasks.register("loadTest", JavaExec) {
-	group = "benchmark"
-	description = "Runs the JMH load tests using the test source set"
-	dependsOn tasks.named("jmhJar")
-	mainClass.set("org.openjdk.jmh.Main")
-	classpath = files("build/libs/${project.name}-${project.version}-jmh.jar") + sourceSets.test.runtimeClasspath
-	args = [
-			"-t", "50",
-			"-wi", "3",
-			"-w", "5s",
-			"-i", "3",
-			"-r", "10s",
-			"-f", "3",
-			"-rf", "json",
-			"-rff", "load_test_report.json"
-	]
-}
+//tasks.register("loadTest", JavaExec) {
+//	group = "benchmark"
+//	description = "Runs the JMH load tests using the test source set"
+//	dependsOn tasks.named("jmhJar")
+//	mainClass.set("org.openjdk.jmh.Main")
+//	classpath = files("build/libs/${project.name}-${project.version}-jmh.jar") + sourceSets.test.runtimeClasspath
+//	args = [
+//			"-t", "50",
+//			"-wi", "3",
+//			"-w", "5s",
+//			"-i", "3",
+//			"-r", "10s",
+//			"-f", "3",
+//			"-rf", "json",
+//			"-rff", "load_test_report.json"
+//	]
+//}
