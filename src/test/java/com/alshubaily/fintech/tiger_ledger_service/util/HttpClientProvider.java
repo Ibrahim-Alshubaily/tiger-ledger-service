@@ -1,0 +1,33 @@
+package com.alshubaily.fintech.tiger_ledger_service.util;
+
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
+import org.apache.hc.client5.http.ssl.NoopHostnameVerifier;
+import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactoryBuilder;
+import org.apache.hc.core5.ssl.SSLContextBuilder;
+
+import javax.net.ssl.SSLContext;
+
+public class HttpClientProvider {
+
+    private static CloseableHttpClient httpClient;
+
+    public static CloseableHttpClient getHttpClient() throws Exception {
+        if (httpClient == null) {
+            SSLContext sslContext = SSLContextBuilder.create()
+                    .loadTrustMaterial((chain, authType) -> true)
+                    .build();
+
+            httpClient = HttpClients.custom()
+                    .setConnectionManager(PoolingHttpClientConnectionManagerBuilder.create()
+                            .setSSLSocketFactory(SSLConnectionSocketFactoryBuilder.create()
+                                    .setSslContext(sslContext)
+                                    .setHostnameVerifier(NoopHostnameVerifier.INSTANCE)
+                                    .build())
+                            .build())
+                    .build();
+        }
+        return httpClient;
+    }
+}
