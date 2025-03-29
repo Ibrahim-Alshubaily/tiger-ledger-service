@@ -11,23 +11,20 @@ import javax.net.ssl.SSLContext;
 
 public class HttpClientProvider {
 
-    private static CloseableHttpClient httpClient;
 
     public static CloseableHttpClient getHttpClient() throws Exception {
-        if (httpClient == null) {
-            SSLContext sslContext = SSLContextBuilder.create()
-                    .loadTrustMaterial((chain, authType) -> true)
-                    .build();
+        SSLContext sslContext = SSLContextBuilder.create()
+                .loadTrustMaterial((chain, authType) -> true)
+                .build();
 
-            httpClient = HttpClients.custom()
-                    .setConnectionManager(PoolingHttpClientConnectionManagerBuilder.create()
-                            .setSSLSocketFactory(SSLConnectionSocketFactoryBuilder.create()
-                                    .setSslContext(sslContext)
-                                    .setHostnameVerifier(NoopHostnameVerifier.INSTANCE)
-                                    .build())
-                            .build())
-                    .build();
-        }
-        return httpClient;
+        return  HttpClients.custom()
+                .setConnectionManager(PoolingHttpClientConnectionManagerBuilder.create()
+                        .setSSLSocketFactory(SSLConnectionSocketFactoryBuilder.create()
+                                .setSslContext(sslContext)
+                                .setHostnameVerifier(NoopHostnameVerifier.INSTANCE)
+                                .build())
+                        .build())
+                .build();
     }
+
 }

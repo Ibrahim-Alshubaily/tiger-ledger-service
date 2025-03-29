@@ -18,8 +18,8 @@ configurations {
 	compileOnly {
 		extendsFrom annotationProcessor
 	}
-	integrationTestImplementation.extendsFrom testImplementation
-	integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
+	e2eTestImplementation.extendsFrom testImplementation
+	e2eTestImplementation.extendsFrom testRuntimeOnly
 }
 
 repositories {
@@ -60,11 +60,11 @@ dependencies {
 }
 
 sourceSets {
-	integrationTest {
-		java.srcDir 'src/test/java' // Using src/test/java for simplicity
+	e2eTest {
+		java.srcDir 'src/test/java'
 		resources.srcDir 'src/test/resources'
-		compileClasspath += sourceSets.test.output
-		runtimeClasspath += sourceSets.test.output
+		compileClasspath += sourceSets.main.output + sourceSets.test.output
+		runtimeClasspath += sourceSets.main.output + sourceSets.test.output
 	}
 }
 
@@ -72,8 +72,8 @@ tasks.register('e2eTest', Test) {
 	group = 'verification'
 	description = 'Runs the E2E tests.'
 	useJUnitPlatform()
-	testClassesDirs = sourceSets.integrationTest.output.classesDirs
-	classpath = sourceSets.integrationTest.runtimeClasspath
+	testClassesDirs = sourceSets.e2eTest.output.classesDirs
+	classpath = sourceSets.e2eTest.runtimeClasspath
 }
 
 //tasks.register("loadTest", JavaExec) {
