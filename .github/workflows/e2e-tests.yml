@@ -56,7 +56,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Run E2E Tests
-        run: ./gradlew e2eTest --no-daemon
+        run: ./gradlew e2eTest --no-daemon --stacktrace
 
       - name: Tear down
         if: always()

@@ -8,9 +8,9 @@ import org.springframework.http.HttpStatus;
 
 import java.util.UUID;
 
-import static com.alshubaily.fintech.tiger_ledger_service.util.TestAuthUtils.GetAuthToken;
-import static com.alshubaily.fintech.tiger_ledger_service.util.TestAuthUtils.signup;
-import static com.alshubaily.fintech.tiger_ledger_service.util.TestAuthUtils.login;
+import static com.alshubaily.fintech.tiger_ledger_service.util.TestAuthUtil.GetAuthToken;
+import static com.alshubaily.fintech.tiger_ledger_service.util.TestAuthUtil.signup;
+import static com.alshubaily.fintech.tiger_ledger_service.util.TestAuthUtil.login;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class AuthenticationTests extends BaseE2ETest {
@@ -45,7 +45,7 @@ public class AuthenticationTests extends BaseE2ETest {
     @Test
     void testInvalidLoginPassword() throws Exception {
         String userIdentifier = UUID.randomUUID().toString();
-        TestAuthUtils.signup(userIdentifier, httpClient);
+        signup(userIdentifier, httpClient);
 
         LoginRequest testUser = new LoginRequest(userIdentifier, "WRONG_PASSWORD", userIdentifier);
         assertThat(login(testUser, httpClient).status()).isEqualTo(HttpStatus.UNAUTHORIZED.value());

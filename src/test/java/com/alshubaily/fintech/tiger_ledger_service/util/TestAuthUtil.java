@@ -11,7 +11,7 @@ import org.apache.hc.core5.http.io.entity.StringEntity;
 
 import static com.alshubaily.fintech.tiger_ledger_service.e2e_test.BaseE2ETest.SERVER_ENDPOINT;
 
-public class TestAuthUtils {
+public class TestAuthUtil {
 
     private static ObjectMapper objectMapper = new ObjectMapper();
     public static int signup(String randomString, CloseableHttpClient client) throws Exception {

@@ -62,7 +62,6 @@ dependencies {
 sourceSets {
 	e2eTest {
 		java.srcDir 'src/test/java'
-		resources.srcDir 'src/test/resources'
 		compileClasspath += sourceSets.main.output + sourceSets.test.output
 		runtimeClasspath += sourceSets.main.output + sourceSets.test.output
 	}
@@ -74,6 +73,7 @@ tasks.register('e2eTest', Test) {
 	useJUnitPlatform()
 	testClassesDirs = sourceSets.e2eTest.output.classesDirs
 	classpath = sourceSets.e2eTest.runtimeClasspath
+	include '**/e2e_test/**'
 }
 
 //tasks.register("loadTest", JavaExec) {
