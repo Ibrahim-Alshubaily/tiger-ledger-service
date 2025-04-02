@@ -13,9 +13,5 @@ public record GetAccountResponse(
         Instant createdAt,
         Long ownerId,
         String ownerName
-) {
-    public GetAccountResponse(BigInteger accountId) {
-        this(accountId, null, null, null, null, null);
-    }
-}
+) {}
 

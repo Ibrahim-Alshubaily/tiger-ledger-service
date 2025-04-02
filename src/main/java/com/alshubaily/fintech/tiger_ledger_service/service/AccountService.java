@@ -9,7 +9,9 @@ import com.alshubaily.fintech.tiger_ledger_service.model.account.response.GetAcc
 import com.alshubaily.fintech.tiger_ledger_service.util.CurrencyUtil;
 import com.alshubaily.fintech.tiger_ledger_service.util.SecurityUtil;
 import com.tigerbeetle.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigInteger;
 import java.text.NumberFormat;
@@ -69,14 +71,18 @@ public class AccountService {
     public List<GetAccountResponse> getAccounts() {
         long userId = SecurityUtil.getAuthenticatedUserId();
         return accountRepository.findAllByOwnerId(userId).stream()
-                .map(acc -> new GetAccountResponse(acc.getAccountId()))
+                .map(acc -> getAccountDetails(acc.getAccountId()))
                 .toList();
     }
 
     public GetAccountResponse getAccountDetails(BigInteger accountId) {
+        Account account = accountRepository.findByAccountId(accountId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Account not found: " + accountId)
+                );
+
         try {
-            Account account = accountRepository.findByAccountId(accountId)
-                    .orElseThrow(() -> new IllegalArgumentException("Account not found in DB: " + accountId));
 
             User user = account.getOwner();
             Instant createdAt = account.getCreatedAt();
@@ -86,7 +92,7 @@ public class AccountService {
             AccountBatch batch = client.lookupAccounts(idBatch);
 
             if (batch.getLength() == 0) {
-                throw new IllegalArgumentException("Account not found in TigerBeetle: " + accountId);
+                throw new IllegalStateException("Account not found in TigerBeetle: " + accountId);
             }
 
             batch.next();
@@ -104,7 +110,7 @@ public class AccountService {
             );
 
         } catch (Exception e) {
-            throw new IllegalArgumentException("Failed to get account: " + e.getMessage(), e);
+            throw new IllegalStateException("Failed to get account: " + e.getMessage(), e);
         }
     }
 }

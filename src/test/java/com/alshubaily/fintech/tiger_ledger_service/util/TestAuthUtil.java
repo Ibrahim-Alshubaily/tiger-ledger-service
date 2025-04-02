@@ -7,9 +7,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.springframework.http.HttpStatus;
 
 
 import static com.alshubaily.fintech.tiger_ledger_service.e2e_test.BaseE2ETest.SERVER_ENDPOINT;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestAuthUtil {
 
@@ -40,5 +42,11 @@ public class TestAuthUtil {
                 new LoginRequest(userIdentifier, userIdentifier, userIdentifier),
                 client);
         return objectMapper.readValue(resp.body(), LoginResponse.class).token();
+    }
+
+    public static String SignUpAndGetToken(String userIdentifier, CloseableHttpClient client) throws Exception {
+        int status = signup(userIdentifier, client);
+        assertThat(status).isEqualTo(HttpStatus.OK.value());
+        return GetAuthToken(userIdentifier, client);
     }
 }

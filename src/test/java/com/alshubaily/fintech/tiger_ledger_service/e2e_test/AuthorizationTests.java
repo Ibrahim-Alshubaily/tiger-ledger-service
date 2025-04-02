@@ -8,8 +8,7 @@ import org.springframework.http.HttpStatus;
 import java.util.UUID;
 
 import static com.alshubaily.fintech.tiger_ledger_service.util.TestAccountUtil.CreateAccount;
-import static com.alshubaily.fintech.tiger_ledger_service.util.TestAuthUtil.GetAuthToken;
-import static com.alshubaily.fintech.tiger_ledger_service.util.TestAuthUtil.signup;
+import static com.alshubaily.fintech.tiger_ledger_service.util.TestAuthUtil.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class AuthorizationTests extends BaseE2ETest {
@@ -17,9 +16,8 @@ public class AuthorizationTests extends BaseE2ETest {
     @Test
     void accountOwnerIsAuthorized() throws Exception {
         String userIdentifier = UUID.randomUUID().toString();
-        String accountId = String.valueOf(CreateAccount(userIdentifier, httpClient));
-
-        String token = GetAuthToken(userIdentifier, httpClient);
+        String token = SignUpAndGetToken(userIdentifier, httpClient);
+        String accountId = String.valueOf(CreateAccount(token, httpClient));
 
         // Get Account details.
         HttpGet request = new HttpGet(SERVER_ENDPOINT + "/accounts/" + accountId);
@@ -32,8 +30,9 @@ public class AuthorizationTests extends BaseE2ETest {
     @Test
     void NonAccountOwnerIsNotAuthorized() throws Exception {
 
-        String userOneIdentifier = UUID.randomUUID().toString();
-        String accountId = String.valueOf(CreateAccount(userOneIdentifier, httpClient));
+        String userIdentifier = UUID.randomUUID().toString();
+        String token = SignUpAndGetToken(userIdentifier, httpClient);
+        String accountId = String.valueOf(CreateAccount(token, httpClient));
 
         String userTwoIdentifier = UUID.randomUUID().toString();
         signup(userTwoIdentifier, httpClient);
