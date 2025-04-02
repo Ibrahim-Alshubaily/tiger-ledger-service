@@ -38,6 +38,7 @@ public class TestAccountUtil {
         request.setHeader("Authorization", "Bearer " + token);
         return HttpRequestUtil.execute(httpClient, request);
     }
+
     public static GetAccountResponse GetAccount(String accountId, String token, CloseableHttpClient httpClient) throws Exception {
         HttpRequestUtil.RequestResult response = GetAccountResponse(accountId, token, httpClient);
         assertThat(response.status()).isEqualTo(HttpStatus.OK.value());
@@ -55,4 +56,7 @@ public class TestAccountUtil {
         return objectMapper.readValue(response.body(), GetAccountResponse[].class);
     }
 
+    public static double GetAccountBalance(String accountId, String token, CloseableHttpClient httpClient) throws Exception {
+        return GetAccount(accountId, token, httpClient).balanceSar();
+    }
 }
