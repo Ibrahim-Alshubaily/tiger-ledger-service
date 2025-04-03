@@ -22,49 +22,52 @@ configurations {
 	e2eTestImplementation.extendsFrom testRuntimeOnly
 }
 
+sourceSets {
+	e2eTest {
+		java {
+			compileClasspath += sourceSets.main.output + sourceSets.test.output
+			runtimeClasspath += output + compileClasspath
+			srcDir file('src/test/java')
+		}
+		resources.srcDir file('src/test/resources')
+	}
+}
+
+
 repositories {
 	mavenCentral()
 }
 
 dependencies {
+	// Application Dependencies
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'com.tigerbeetle:tigerbeetle-java:0.16.31'
-
 	implementation 'org.postgresql:postgresql:42.6.0'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.security:spring-security-crypto:6.2.1'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
 	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	// Development Tools
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
+	// Lombok
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 
-	developmentOnly 'org.springframework.boot:spring-boot-devtools'
-
+	// Testing Dependencies
 	testImplementation platform('org.junit:junit-bom:5.10.0')
 	testImplementation 'org.junit.jupiter:junit-jupiter-api'
-	testRuntimeOnly  'org.junit.jupiter:junit-jupiter-engine'
-
+	testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
 	testImplementation 'org.apache.httpcomponents.client5:httpclient5:5.2.1'
 	testImplementation 'org.assertj:assertj-core:3.24.2'
 
-
-//	testImplementation 'org.openjdk.jmh:jmh-core:1.36'
-//	testAnnotationProcessor 'org.openjdk.jmh:jmh-generator-annprocess:1.36'
-
-}
-
-sourceSets {
-	e2eTest {
-		java.srcDir 'src/test/java'
-		compileClasspath += sourceSets.main.output + sourceSets.test.output
-		runtimeClasspath += sourceSets.main.output + sourceSets.test.output
-	}
+	// JMH Benchmarking
+	jmhImplementation 'org.openjdk.jmh:jmh-core:1.36'
+	jmhAnnotationProcessor 'org.openjdk.jmh:jmh-generator-annprocess:1.36'
 }
 
 tasks.register('e2eTest', Test) {
@@ -76,20 +79,15 @@ tasks.register('e2eTest', Test) {
 	include '**/e2e_test/**'
 }
 
-//tasks.register("loadTest", JavaExec) {
-//	group = "benchmark"
-//	description = "Runs the JMH load tests using the test source set"
-//	dependsOn tasks.named("jmhJar")
-//	mainClass.set("org.openjdk.jmh.Main")
-//	classpath = files("build/libs/${project.name}-${project.version}-jmh.jar") + sourceSets.test.runtimeClasspath
-//	args = [
-//			"-t", "50",
-//			"-wi", "3",
-//			"-w", "5s",
-//			"-i", "3",
-//			"-r", "10s",
-//			"-f", "3",
-//			"-rf", "json",
-//			"-rff", "load_test_report.json"
-//	]
-//}
+jmh {
+	resultFormat = 'JSON'
+	resultsFile = file("benchmark_report.json")
+
+	fork = 3
+	warmupIterations = 3
+	warmup = '5s'
+	iterations = 3
+	timeOnIteration = '10s'
+	threads = 50
+}
+

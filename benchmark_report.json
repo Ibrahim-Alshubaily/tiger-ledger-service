@@ -1,0 +1,144 @@
+[
+    {
+        "jmhVersion" : "1.36",
+        "benchmark" : "com.alshubaily.fintech.tiger_ledger_service.TransferBenchmark.benchmarkDeposit",
+        "mode" : "thrpt",
+        "threads" : 50,
+        "forks" : 3,
+        "jvm" : "/opt/homebrew/Cellar/openjdk@17/17.0.14/libexec/openjdk.jdk/Contents/Home/bin/java",
+        "jvmArgs" : [
+            "-Dfile.encoding=UTF-8",
+            "-Djava.io.tmpdir=/Users/ibra10xdeveloper/code/tiger-ledger/tiger-ledger-service/build/tmp/jmh",
+            "-Duser.country=GB",
+            "-Duser.language=en",
+            "-Duser.variant"
+        ],
+        "jdkVersion" : "17.0.14",
+        "vmName" : "OpenJDK 64-Bit Server VM",
+        "vmVersion" : "17.0.14+0",
+        "warmupIterations" : 3,
+        "warmupTime" : "5 s",
+        "warmupBatchSize" : 1,
+        "measurementIterations" : 3,
+        "measurementTime" : "10 s",
+        "measurementBatchSize" : 1,
+        "primaryMetric" : {
+            "score" : 910.3557156683821,
+            "scoreError" : 207.67931182111394,
+            "scoreConfidence" : [
+                702.6764038472681,
+                1118.035027489496
+            ],
+            "scorePercentiles" : {
+                "0.0" : 723.17271010309,
+                "50.0" : 901.7998721899194,
+                "90.0" : 1059.427145885087,
+                "95.0" : 1059.427145885087,
+                "99.0" : 1059.427145885087,
+                "99.9" : 1059.427145885087,
+                "99.99" : 1059.427145885087,
+                "99.999" : 1059.427145885087,
+                "99.9999" : 1059.427145885087,
+                "100.0" : 1059.427145885087
+            },
+            "scoreUnit" : "ops/s",
+            "rawData" : [
+                [
+                    1046.1053062164203,
+                    1029.6014451103836,
+                    1059.427145885087
+                ],
+                [
+                    723.17271010309,
+                    803.789217479762,
+                    773.2641729922752
+                ],
+                [
+                    901.7998721899194,
+                    954.799040038049,
+                    901.2425310004523
+                ]
+            ]
+        },
+        "secondaryMetrics" : {
+            "failedRequestsCount" : {
+                "score" : 31601.0,
+                "scoreError" : "NaN",
+                "scoreConfidence" : [
+                    31601.0,
+                    31601.0
+                ],
+                "scorePercentiles" : {
+                    "0.0" : 0.0,
+                    "50.0" : 0.0,
+                    "90.0" : 10692.0,
+                    "95.0" : 10692.0,
+                    "99.0" : 10692.0,
+                    "99.9" : 10692.0,
+                    "99.99" : 10692.0,
+                    "99.999" : 10692.0,
+                    "99.9999" : 10692.0,
+                    "100.0" : 10692.0
+                },
+                "scoreUnit" : "#",
+                "rawData" : [
+                    [
+                        10527.0,
+                        10382.0,
+                        10692.0
+                    ],
+                    [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        0.0,
+                        0.0
+                    ]
+                ]
+            },
+            "totalRequestsCount" : {
+                "score" : 82761.0,
+                "scoreError" : "NaN",
+                "scoreConfidence" : [
+                    82761.0,
+                    82761.0
+                ],
+                "scorePercentiles" : {
+                    "0.0" : 7318.0,
+                    "50.0" : 9118.0,
+                    "90.0" : 10692.0,
+                    "95.0" : 10692.0,
+                    "99.0" : 10692.0,
+                    "99.9" : 10692.0,
+                    "99.99" : 10692.0,
+                    "99.999" : 10692.0,
+                    "99.9999" : 10692.0,
+                    "100.0" : 10692.0
+                },
+                "scoreUnit" : "#",
+                "rawData" : [
+                    [
+                        10527.0,
+                        10382.0,
+                        10692.0
+                    ],
+                    [
+                        7318.0,
+                        8129.0,
+                        7839.0
+                    ],
+                    [
+                        9117.0,
+                        9639.0,
+                        9118.0
+                    ]
+                ]
+            }
+        }
+    }
+]
+
+
