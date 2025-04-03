@@ -2,6 +2,7 @@ package com.alshubaily.fintech.tiger_ledger_service.util;
 
 import com.alshubaily.fintech.tiger_ledger_service.db.user.User;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -10,15 +11,21 @@ import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
-
 @Component
 public class JwtUtil {
 
-    @Value("${jwt.secret:9d7bfd1ba3e236ae73d8c7c3ddef4ad4}")
-    private String jwtSecret;
+    private final Key signingKey;
+    private final JwtParser jwtParser;
 
     @Value("${jwt.expirationMs:86400000}")
     private long jwtExpirationMs;
+
+    public JwtUtil(@Value("${jwt.secret:9d7bfd1ba3e236ae73d8c7c3ddef4ad4}") String jwtSecret) {
+        this.signingKey = Keys.hmacShaKeyFor(jwtSecret.getBytes());
+        this.jwtParser = Jwts.parserBuilder()
+                .setSigningKey(signingKey)
+                .build();
+    }
 
     public String generateToken(User user) {
         return Jwts.builder()
@@ -28,19 +35,11 @@ public class JwtUtil {
                 .claim("username", user.getUsername())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .signWith(signingKey, SignatureAlgorithm.HS256)
                 .compact();
     }
 
     public Claims validateToken(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(getSigningKey())
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
-    }
-
-    private Key getSigningKey() {
-        return Keys.hmacShaKeyFor(jwtSecret.getBytes());
+        return jwtParser.parseClaimsJws(token).getBody();
     }
 }
