@@ -23,7 +23,7 @@ public class JwtUtil {
 
     public JwtUtil(@Value("${jwt.secret:9d7bfd1ba3e236ae73d8c7c3ddef4ad4}") String jwtSecret) {
         this.signingKey = Keys.hmacShaKeyFor(jwtSecret.getBytes());
-        this.jwtParser = Jwts.parserBuilder()
+        this.jwtParser = Jwts.parser()
                 .setSigningKey(signingKey)
                 .build();
     }

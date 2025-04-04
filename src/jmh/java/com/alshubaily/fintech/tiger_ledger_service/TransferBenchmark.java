@@ -19,11 +19,11 @@ import static com.alshubaily.fintech.tiger_ledger_service.util.TestAuthUtil.*;
 @OutputTimeUnit(TimeUnit.SECONDS)
 public class TransferBenchmark {
 
-    protected static CloseableHttpClient CLIENT;
+    protected CloseableHttpClient CLIENT;
 
-    protected static String TOKEN;
+    protected String TOKEN;
 
-    protected static String ACCOUNT_ID;
+    protected String ACCOUNT_ID;
 
 
 
