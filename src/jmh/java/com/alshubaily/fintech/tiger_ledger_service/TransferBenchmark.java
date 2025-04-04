@@ -44,8 +44,15 @@ public class TransferBenchmark {
 
     private boolean makeRequest() {
         try {
-            return TransactionTestUtil.deposit(1, ACCOUNT_ID, TOKEN, CLIENT).status() == HttpStatus.OK.value();
+            var response = TransactionTestUtil.deposit(1, ACCOUNT_ID, TOKEN, CLIENT);
+            if (response.status() != HttpStatus.OK.value()) {
+                System.err.println("Request failed with status: " + response.status());
+                return false;
+            }
+            return true;
         } catch (Exception e) {
+            System.err.println("Request failed with exception: " + e.getMessage());
+            e.printStackTrace();
             return false;
         }
     }

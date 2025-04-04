@@ -76,7 +76,7 @@ public class AccountService {
     }
 
     public GetAccountResponse getAccountDetails(BigInteger accountId) {
-        Account account = accountRepository.findByAccountId(accountId)
+        Account account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND,
                         "Account not found: " + accountId)

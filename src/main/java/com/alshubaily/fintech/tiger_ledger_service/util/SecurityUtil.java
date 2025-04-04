@@ -23,13 +23,10 @@ public class SecurityUtil {
         }
 
         if (auth.getCredentials() instanceof Claims claims) {
-            Object userId = claims.get("userId");
-            if (userId != null) {
-                System.err.println("userId.toString(): "+ userId);
-                return Long.parseLong(userId.toString());
+            if (claims.get("userId") instanceof Number number) {
+                return number.longValue();
             }
         }
-
         throw new IllegalStateException("userId claim not found in authentication claims");
     }
 }
