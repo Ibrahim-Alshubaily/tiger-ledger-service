@@ -20,6 +20,8 @@ services:
     security_opt:
       - seccomp=unconfined
     restart: unless-stopped
+    networks:
+      - tiger-network
 
   tigerbeetle:
     build:
@@ -40,6 +42,8 @@ services:
       retries: 5
       start_period: 5s
       timeout: 3s
+    networks:
+      - tiger-network
 
   postgres:
     image: postgres:15
@@ -58,7 +62,12 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - tiger-network
 
 volumes:
   tigerbeetle-data:
   pgdata:
+
+networks:
+  tiger-network:
