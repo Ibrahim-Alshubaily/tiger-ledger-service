@@ -1,6 +1,6 @@
 package com.alshubaily.fintech.tiger_ledger_service.e2e_test;
 
-import com.alshubaily.fintech.tiger_ledger_service.model.transaction.Transaction;
+import com.alshubaily.fintech.tiger_ledger_service.model.transaction.TransactionType;
 import com.alshubaily.fintech.tiger_ledger_service.model.transaction.response.GetTransactionResponse;
 import org.junit.jupiter.api.Test;
 
@@ -27,7 +27,7 @@ class ListTransactionsTest extends BaseE2ETest {
         GetTransactionResponse[] transactions = listTransactions(accountId.toString(), token, httpClient);
         assertThat(transactions).hasSize(1);
         assertThat(transactions[0]).isEqualTo(new GetTransactionResponse(
-                Transaction.DEPOSIT,
+                TransactionType.DEPOSIT,
                 null,
                 accountId,
                 amount,
@@ -46,7 +46,7 @@ class ListTransactionsTest extends BaseE2ETest {
         GetTransactionResponse[] transactions = listTransactions(accountId.toString(), token, httpClient);
         assertThat(transactions).hasSize(1);
         assertThat(transactions[0]).isEqualTo(new GetTransactionResponse(
-                Transaction.WITHDRAW,
+                TransactionType.WITHDRAW,
                 accountId,
                 null,
                 amount,
@@ -66,7 +66,7 @@ class ListTransactionsTest extends BaseE2ETest {
         GetTransactionResponse[] transactions = listTransactions(from.toString(), token, httpClient);
         assertThat(transactions).hasSize(1);
         assertThat(transactions[0]).isEqualTo(new GetTransactionResponse(
-                Transaction.TRANSFER,
+                TransactionType.TRANSFER,
                 from,
                 to,
                 amount,

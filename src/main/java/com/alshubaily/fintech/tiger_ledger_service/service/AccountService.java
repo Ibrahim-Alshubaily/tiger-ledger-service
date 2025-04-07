@@ -23,7 +23,7 @@ import java.util.Locale;
 public class AccountService {
 
     private final Client client;
-    static final BigInteger CASH_ACCOUNT_ID = BigInteger.valueOf(Long.MAX_VALUE);
+    public static final BigInteger CASH_ACCOUNT_ID = BigInteger.valueOf(Long.MAX_VALUE);
     static final int LEDGER = 1;
     static final int CODE = 1;
     private final UserRepository userRepository;

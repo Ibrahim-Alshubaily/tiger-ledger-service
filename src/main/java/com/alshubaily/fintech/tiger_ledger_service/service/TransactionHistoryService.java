@@ -1,6 +1,6 @@
 package com.alshubaily.fintech.tiger_ledger_service.service;
 
-import com.alshubaily.fintech.tiger_ledger_service.model.transaction.Transaction;
+import com.alshubaily.fintech.tiger_ledger_service.model.transaction.TransactionType;
 import com.alshubaily.fintech.tiger_ledger_service.model.transaction.response.GetTransactionResponse;
 import com.alshubaily.fintech.tiger_ledger_service.util.CurrencyUtil;
 import com.tigerbeetle.*;
@@ -12,7 +12,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.alshubaily.fintech.tiger_ledger_service.service.AccountService.CASH_ACCOUNT_ID;
+import static com.alshubaily.fintech.tiger_ledger_service.util.TransactionUtil.getTransactionType;
 
 @Service
 @AllArgsConstructor
@@ -38,11 +38,11 @@ public class TransactionHistoryService {
 
         BigInteger debitAccountId = UInt128.asBigInteger(curr.getDebitAccountId());
         BigInteger creditAccountId = UInt128.asBigInteger(curr.getCreditAccountId());
-        Transaction transactionType = getTransactionType(debitAccountId, creditAccountId);
+        TransactionType transactionType = getTransactionType(debitAccountId, creditAccountId);
 
-        if (transactionType == Transaction.DEPOSIT) {
+        if (transactionType == TransactionType.DEPOSIT) {
             debitAccountId = null;
-        } else if (transactionType == Transaction.WITHDRAW) {
+        } else if (transactionType == TransactionType.WITHDRAW) {
             creditAccountId = null;
         }
 
@@ -56,17 +56,5 @@ public class TransactionHistoryService {
 
 
         return transactionResponse;
-    }
-
-    private Transaction getTransactionType(BigInteger debitAccountId, BigInteger creditAccountId) {
-        if (CASH_ACCOUNT_ID.equals(debitAccountId)) {
-            return Transaction.DEPOSIT;
-        }
-
-        if (CASH_ACCOUNT_ID.equals(creditAccountId)) {
-            return Transaction.WITHDRAW;
-        }
-
-        return Transaction.TRANSFER;
     }
 }

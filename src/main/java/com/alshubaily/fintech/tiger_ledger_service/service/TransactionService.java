@@ -1,5 +1,6 @@
 package com.alshubaily.fintech.tiger_ledger_service.service;
 
+import com.alshubaily.fintech.tiger_ledger_service.eventbus.KafkaEventPublisher;
 import com.alshubaily.fintech.tiger_ledger_service.model.transaction.request.DepositRequest;
 import com.alshubaily.fintech.tiger_ledger_service.model.transaction.request.TransferRequest;
 import com.alshubaily.fintech.tiger_ledger_service.model.transaction.request.WithdrawRequest;
@@ -13,12 +14,15 @@ import java.math.BigInteger;
 import java.time.Instant;
 
 import static com.alshubaily.fintech.tiger_ledger_service.service.AccountService.*;
+import static com.alshubaily.fintech.tiger_ledger_service.util.TransactionUtil.publishToEventBus;
 
 @Service
 @AllArgsConstructor
 public class TransactionService {
 
     private final Client client;
+    private final KafkaEventPublisher eventPublisher;
+
 
     private TransferResponse transfer(BigInteger debitAccountId, BigInteger creditAccountId, double amountSar) {
         long amountHalala = CurrencyUtil.sarToHalala(amountSar);
@@ -40,6 +44,8 @@ public class TransactionService {
             result.next();
             throw new IllegalStateException("Transfer rejected by TigerBeetle: " + result.getResult());
         }
+
+        publishToEventBus(transfers, eventPublisher);
 
         return new TransferResponse(
                 UInt128.asBigInteger(transactionIdBytes).toString(),
