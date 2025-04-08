@@ -15,14 +15,31 @@ java {
 }
 
 configurations {
+
+	sparkRuntime {
+		canBeResolved = true
+		canBeConsumed = false
+	}
+
+
 	compileOnly {
 		extendsFrom annotationProcessor
 	}
+
 	e2eTestImplementation.extendsFrom testImplementation
 	e2eTestImplementation.extendsFrom testRuntimeOnly
 }
 
 sourceSets {
+	spark {
+		java {
+			srcDirs = ['src/spark/java']
+			compileClasspath += configurations.sparkRuntime
+			runtimeClasspath += configurations.sparkRuntime
+		}
+
+	}
+
 	e2eTest {
 		java {
 			compileClasspath += sourceSets.main.output + sourceSets.test.output
@@ -32,7 +49,6 @@ sourceSets {
 		resources.srcDir file('src/test/resources')
 	}
 }
-
 
 repositories {
 	mavenCentral()
@@ -59,6 +75,9 @@ dependencies {
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 
+	sparkRuntime 'org.apache.spark:spark-sql_2.12:3.3.0'
+	sparkRuntime 'org.apache.spark:spark-sql-kafka-0-10_2.12:3.3.0'
+
 	// Testing Dependencies
 	testImplementation platform('org.junit:junit-bom:5.10.0')
 	testImplementation 'org.junit.jupiter:junit-jupiter-api'
@@ -69,6 +88,16 @@ dependencies {
 	// JMH Benchmarking
 	jmhImplementation 'org.openjdk.jmh:jmh-core:1.36'
 	jmhAnnotationProcessor 'org.openjdk.jmh:jmh-generator-annprocess:1.36'
+}
+
+tasks.register('sparkJar', Jar) {
+	archiveBaseName.set('spark-streaming-job')
+	from(sourceSets.spark.output)
+	dependsOn tasks.named('compileSparkJava')
+
+	manifest {
+		attributes 'Main-Class': 'com.alshubaily.fintech.tiger_ledger_service.spark.Main'
+	}
 }
 
 tasks.register('e2eTest', Test) {
@@ -91,4 +120,3 @@ jmh {
 	timeOnIteration = '10s'
 	threads = 50
 }
-

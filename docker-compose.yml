@@ -85,6 +85,16 @@ services:
     networks:
       - tiger-network
 
+  spark-streaming-job:
+    build:
+      context: .
+      dockerfile: docker/spark/Dockerfile
+    container_name: spark-streaming-job
+    depends_on:
+      - kafka
+    networks:
+      - tiger-network
+
 volumes:
   tigerbeetle-data:
   pgdata:
