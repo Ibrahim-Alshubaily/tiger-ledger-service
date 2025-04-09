@@ -44,7 +44,9 @@ public class TransferBenchmark {
 
     private boolean makeRequest() {
         try {
-            var response = TransactionTestUtil.deposit(1, ACCOUNT_ID, TOKEN, CLIENT);
+
+            double randomAmount = Math.random() * 9000 + 1000; // 1000.0 - 9999.99
+            var response = TransactionTestUtil.deposit(randomAmount, ACCOUNT_ID, TOKEN, CLIENT);
             if (response.status() != HttpStatus.OK.value()) {
                 System.err.println("Request failed with status: " + response.status());
                 return false;

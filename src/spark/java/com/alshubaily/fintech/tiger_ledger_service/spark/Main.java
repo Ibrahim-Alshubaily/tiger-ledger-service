@@ -7,8 +7,11 @@ import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.functions;
 import org.apache.spark.sql.streaming.StreamingQueryException;
+import org.apache.spark.sql.streaming.Trigger;
 
 import java.util.concurrent.TimeoutException;
+
+import static org.apache.spark.sql.functions.*;
 
 public class Main {
     public static void main(String[] args) throws TimeoutException, StreamingQueryException {
@@ -24,13 +27,22 @@ public class Main {
 
         Dataset<Row> transactions = stream.selectExpr("CAST(value AS STRING) as json")
                 .select(functions.from_json(
-                        functions.col("json"),
+                        col("json"),
                         SchemaUtil.schemaFromRecord(TransactionEvent.class)
                 ).as("data"))
                 .select("data.*");
 
-        transactions.writeStream()
+        Dataset<Row> dashboardMetrics = transactions
+                .groupBy(col("transactionType"))
+                .agg(
+                        count("*").alias("transaction_count"),
+                        sum("amount").alias("total_amount")
+                );
+
+        dashboardMetrics.writeStream()
                 .format("console")
+                .outputMode("update")
+                .trigger(Trigger.ProcessingTime("1 minute"))
                 .option("truncate", "false")
                 .start()
                 .awaitTermination();
