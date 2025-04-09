@@ -1,8 +1,11 @@
 package com.alshubaily.fintech.tiger_ledger_service.spark;
 
+import com.alshubaily.fintech.tiger_ledger_service.eventbus.TransactionEvent;
+import com.alshubaily.fintech.tiger_ledger_service.spark.util.SchemaUtil;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.functions;
 import org.apache.spark.sql.streaming.StreamingQueryException;
 
 import java.util.concurrent.TimeoutException;
@@ -19,7 +22,14 @@ public class Main {
                 .option("subscribe", "transactions")
                 .load();
 
-        stream.writeStream()
+        Dataset<Row> transactions = stream.selectExpr("CAST(value AS STRING) as json")
+                .select(functions.from_json(
+                        functions.col("json"),
+                        SchemaUtil.schemaFromRecord(TransactionEvent.class)
+                ).as("data"))
+                .select("data.*");
+
+        transactions.writeStream()
                 .format("console")
                 .option("truncate", "false")
                 .start()

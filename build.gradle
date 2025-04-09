@@ -31,11 +31,17 @@ configurations {
 }
 
 sourceSets {
+	main {
+		java {
+			srcDirs = ['src/main/java']
+		}
+	}
+
 	spark {
 		java {
 			srcDirs = ['src/spark/java']
-			compileClasspath += configurations.sparkRuntime
-			runtimeClasspath += configurations.sparkRuntime
+			compileClasspath += configurations.sparkRuntime + sourceSets.main.output
+			runtimeClasspath += configurations.sparkRuntime + sourceSets.main.output
 		}
 
 	}
@@ -93,6 +99,7 @@ dependencies {
 tasks.register('sparkJar', Jar) {
 	archiveBaseName.set('spark-streaming-job')
 	from(sourceSets.spark.output)
+	from(sourceSets.main.output)
 	dependsOn tasks.named('compileSparkJava')
 
 	manifest {
