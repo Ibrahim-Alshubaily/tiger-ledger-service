@@ -21,7 +21,7 @@ RUN mkdir -p src/main/resources && \
 
 COPY . .
 
-RUN ./gradlew clean build -x test --no-daemon
+RUN ./gradlew build -x test --no-daemon
 
 
 FROM eclipse-temurin:17-jre AS runner

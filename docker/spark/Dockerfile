@@ -2,7 +2,7 @@ FROM gradle:8.2.1-jdk17 AS builder
 
 WORKDIR /app
 COPY . .
-RUN ./gradlew clean sparkJar --no-daemon
+RUN ./gradlew sparkJar --no-daemon
 
 FROM spark:3.5.0-java17
 

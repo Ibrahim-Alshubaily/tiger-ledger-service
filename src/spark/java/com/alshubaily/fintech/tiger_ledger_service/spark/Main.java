@@ -37,10 +37,10 @@ public class Main {
                 col("data.amount").alias("amount"),
                 col("data.transactionType").alias("transactionType"),
                 col("data.timestamp").alias("timestamp").cast("timestamp")
-        ).withWatermark("timestamp", "1 minute");
+        );
 
         Dataset<Row> metrics = transactions
-                .groupBy(window(col("timestamp"), "1 minute"), col("transactionType"))
+                .groupBy(col("transactionType"))
                 .agg(
                         count("*").alias("transaction_count"),
                         sum(col("amount").cast("double").divide(100.0)).alias("total_amount")
@@ -52,7 +52,7 @@ public class Main {
                 );
 
         metrics.writeStream()
-                .outputMode("append")
+                .outputMode("update")
                 .trigger(Trigger.ProcessingTime(1, TimeUnit.MINUTES))
                 .option("checkpointLocation", "file:/checkpoints/prometheus-metrics")
                 .foreachBatch((batchDF, batchId) -> {

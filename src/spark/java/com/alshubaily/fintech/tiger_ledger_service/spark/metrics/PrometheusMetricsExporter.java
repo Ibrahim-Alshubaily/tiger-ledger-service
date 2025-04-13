@@ -2,7 +2,6 @@ package com.alshubaily.fintech.tiger_ledger_service.spark.metrics;
 
 import io.prometheus.client.Counter;
 import io.prometheus.client.exporter.HTTPServer;
-import io.prometheus.client.hotspot.DefaultExports;
 import org.apache.spark.sql.Row;
 
 import java.io.IOException;
@@ -24,7 +23,7 @@ public class PrometheusMetricsExporter {
     private static HTTPServer server;
 
     public static void start(int port) throws IOException {
-        DefaultExports.initialize(); // JVM-level metrics
+        // DefaultExports.initialize();
         server = new HTTPServer(port);
     }
 
@@ -33,7 +32,12 @@ public class PrometheusMetricsExporter {
         long count = row.getAs("transaction_count");
         double amount = row.getAs("total_amount");
 
+        System.out.printf("Exporting metrics: type=%s, count=%d, amount=%.2f%n", type, count, amount);
+
         transactionCounter.labels(type).inc(count);
+        System.out.printf("Incremented transaction_count_total{transaction_type=\"%s\"} by %d%n", type, count);
+
         transactionAmount.labels(type).inc(amount);
+        System.out.printf("Incremented transaction_amount_total{transaction_type=\"%s\"} by %.2f%n", type, amount);
     }
 }
