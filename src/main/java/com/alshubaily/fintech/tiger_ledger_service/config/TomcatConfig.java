@@ -11,21 +11,23 @@ public class TomcatConfig implements WebServerFactoryCustomizer<TomcatServletWeb
 
     @Override
     public void customize(TomcatServletWebServerFactory factory) {
-        factory.addConnectorCustomizers((Connector connector) -> {
-            AbstractHttp11Protocol<?> protocol = (AbstractHttp11Protocol<?>) connector.getProtocolHandler();
+        factory.addConnectorCustomizers(
+                (Connector connector) -> {
+                    AbstractHttp11Protocol<?> protocol =
+                            (AbstractHttp11Protocol<?>) connector.getProtocolHandler();
 
-            protocol.setMaxThreads(500);
-            protocol.setMinSpareThreads(50);
+                    protocol.setMaxThreads(500);
+                    protocol.setMinSpareThreads(50);
 
-            protocol.setMaxConnections(2000);
-            protocol.setAcceptCount(1000);
+                    protocol.setMaxConnections(2000);
+                    protocol.setAcceptCount(1000);
 
-            protocol.setKeepAliveTimeout(5000);
-            protocol.setMaxKeepAliveRequests(100);
+                    protocol.setKeepAliveTimeout(5000);
+                    protocol.setMaxKeepAliveRequests(100);
 
-            protocol.setCompression("on");
+                    protocol.setCompression("on");
 
-            connector.addUpgradeProtocol(new org.apache.coyote.http2.Http2Protocol());
-        });
+                    connector.addUpgradeProtocol(new org.apache.coyote.http2.Http2Protocol());
+                });
     }
 }

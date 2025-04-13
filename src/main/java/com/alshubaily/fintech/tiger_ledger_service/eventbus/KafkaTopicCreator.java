@@ -1,13 +1,12 @@
 package com.alshubaily.fintech.tiger_ledger_service.eventbus;
 
 import jakarta.annotation.PostConstruct;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.kafka.core.KafkaAdmin;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -15,9 +14,7 @@ public class KafkaTopicCreator {
 
     private final KafkaAdmin kafkaAdmin;
 
-    private static final String[] TOPICS = {
-            "transactions"
-    };
+    private static final String[] TOPICS = {"transactions"};
 
     @PostConstruct
     public void createTopics() {

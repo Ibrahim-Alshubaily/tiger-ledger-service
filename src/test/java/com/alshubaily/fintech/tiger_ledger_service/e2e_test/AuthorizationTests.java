@@ -1,15 +1,14 @@
 package com.alshubaily.fintech.tiger_ledger_service.e2e_test;
 
-import com.alshubaily.fintech.tiger_ledger_service.util.HttpRequestUtil;
-import org.apache.hc.client5.http.classic.methods.HttpGet;
-import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
-
-import java.util.UUID;
-
 import static com.alshubaily.fintech.tiger_ledger_service.util.TestAccountUtil.CreateAccount;
 import static com.alshubaily.fintech.tiger_ledger_service.util.TestAuthUtil.*;
 import static org.assertj.core.api.Assertions.assertThat;
+
+import com.alshubaily.fintech.tiger_ledger_service.util.HttpRequestUtil;
+import java.util.UUID;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 
 public class AuthorizationTests extends BaseE2ETest {
 

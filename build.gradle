@@ -3,6 +3,8 @@ plugins {
 	id 'org.springframework.boot' version '3.4.3'
 	id 'io.spring.dependency-management' version '1.1.7'
 	id 'me.champeau.jmh' version '0.7.3'
+	id 'checkstyle'
+	id 'com.diffplug.spotless' version '7.0.0'
 }
 
 group = 'com.alshubaily.fintech'
@@ -15,17 +17,13 @@ java {
 }
 
 configurations {
-
 	sparkRuntime {
 		canBeResolved = true
 		canBeConsumed = false
 	}
-
-
 	compileOnly {
 		extendsFrom annotationProcessor
 	}
-
 	e2eTestImplementation.extendsFrom testImplementation
 	e2eTestImplementation.extendsFrom testRuntimeOnly
 }
@@ -36,16 +34,13 @@ sourceSets {
 			srcDirs = ['src/main/java']
 		}
 	}
-
 	spark {
 		java {
 			srcDirs = ['src/spark/java']
 			compileClasspath += configurations.sparkRuntime + sourceSets.main.output
 			runtimeClasspath += configurations.sparkRuntime + sourceSets.main.output
 		}
-
 	}
-
 	e2eTest {
 		java {
 			compileClasspath += sourceSets.main.output + sourceSets.test.output
@@ -95,6 +90,8 @@ dependencies {
 
 	jmhImplementation 'org.openjdk.jmh:jmh-core:1.36'
 	jmhAnnotationProcessor 'org.openjdk.jmh:jmh-generator-annprocess:1.36'
+
+	checkstyle 'com.puppycrawl.tools:checkstyle:10.17.0'
 }
 
 tasks.register('sparkJar', Jar) {
@@ -135,4 +132,45 @@ jmh {
 	iterations = 3
 	timeOnIteration = '10s'
 	threads = 50
+}
+
+checkstyle {
+	configFile = file("${rootDir}/config/checkstyle/checkstyle.xml")
+	maxWarnings = 0
+	showViolations = true
+}
+
+tasks.named('checkstyleMain') {
+	description = 'Runs Checkstyle linting on main source set'
+	group = 'verification'
+}
+
+tasks.named('checkstyleTest') {
+	description = 'Runs Checkstyle linting on test source set'
+	group = 'verification'
+}
+
+tasks.register('lint') {
+	group = 'verification'
+	description = 'Runs Checkstyle linting on all source sets'
+	dependsOn tasks.checkstyleMain, tasks.checkstyleTest
+}
+
+spotless {
+	java {
+		// Remove unused imports
+		removeUnusedImports()
+		// Order imports: standard Java, blank line, project-specific, blank line, others
+		importOrder('java|javax|jakarta', 'com.alshubaily', '')
+		// Optional: Apply formatting for consistency
+		googleJavaFormat('1.23.0').aosp()
+		// Apply to main, spark, and test source sets
+		target sourceSets.main.java.srcDirs, sourceSets.spark.java.srcDirs, sourceSets.e2eTest.java.srcDirs
+	}
+}
+
+tasks.register('fixImports') {
+	group = 'formatting'
+	description = 'Autofixes unused imports and orders them using Spotless'
+	dependsOn tasks.spotlessApply
 }

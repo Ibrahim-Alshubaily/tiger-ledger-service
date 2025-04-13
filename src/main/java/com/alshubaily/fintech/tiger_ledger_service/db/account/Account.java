@@ -2,10 +2,9 @@ package com.alshubaily.fintech.tiger_ledger_service.db.account;
 
 import com.alshubaily.fintech.tiger_ledger_service.db.user.User;
 import jakarta.persistence.*;
-import lombok.Data;
-
 import java.math.BigInteger;
 import java.time.Instant;
+import lombok.Data;
 
 @Entity
 @Table(name = "accounts")

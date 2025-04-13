@@ -1,9 +1,8 @@
 package com.alshubaily.fintech.tiger_ledger_service.model.account.response;
 
-
-import java.time.Instant;
-import java.math.BigInteger;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import java.math.BigInteger;
+import java.time.Instant;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record GetAccountResponse(
@@ -12,6 +11,4 @@ public record GetAccountResponse(
         Double balanceSar,
         Instant createdAt,
         Long ownerId,
-        String ownerName
-) {}
-
+        String ownerName) {}

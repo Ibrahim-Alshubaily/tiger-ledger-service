@@ -1,8 +1,8 @@
 package com.alshubaily.fintech.tiger_ledger_service.config;
 
+import com.alshubaily.fintech.tiger_ledger_service.util.DomainNameResolver;
 import com.tigerbeetle.Client;
 import com.tigerbeetle.UInt128;
-import com.alshubaily.fintech.tiger_ledger_service.util.DomainNameResolver;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,6 +22,6 @@ public class TigerBeetleConfiguration {
     @Bean
     public Client tigerBeetleClient() {
         String address = DomainNameResolver.resolveAddress(host, port);
-        return new Client(UInt128.asBytes(cluster), new String[]{address});
+        return new Client(UInt128.asBytes(cluster), new String[] {address});
     }
 }

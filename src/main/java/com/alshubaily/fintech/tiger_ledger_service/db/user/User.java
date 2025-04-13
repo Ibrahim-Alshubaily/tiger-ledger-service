@@ -1,9 +1,8 @@
 package com.alshubaily.fintech.tiger_ledger_service.db.user;
 
 import jakarta.persistence.*;
-import lombok.Data;
-
 import java.time.LocalDateTime;
+import lombok.Data;
 
 @Entity
 @Table(name = "users")

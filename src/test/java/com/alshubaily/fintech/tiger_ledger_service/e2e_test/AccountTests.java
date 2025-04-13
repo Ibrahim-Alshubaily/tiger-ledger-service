@@ -1,15 +1,14 @@
 package com.alshubaily.fintech.tiger_ledger_service.e2e_test;
 
-import com.alshubaily.fintech.tiger_ledger_service.model.account.response.GetAccountResponse;
-import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
-
-import java.math.BigInteger;
-import java.util.UUID;
-
 import static com.alshubaily.fintech.tiger_ledger_service.util.TestAccountUtil.*;
 import static com.alshubaily.fintech.tiger_ledger_service.util.TestAuthUtil.SignUpAndGetToken;
 import static org.assertj.core.api.Assertions.assertThat;
+
+import com.alshubaily.fintech.tiger_ledger_service.model.account.response.GetAccountResponse;
+import java.math.BigInteger;
+import java.util.UUID;
+import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 
 public class AccountTests extends BaseE2ETest {
 
@@ -55,7 +54,6 @@ public class AccountTests extends BaseE2ETest {
         BigInteger accountId = CreateAccount(ownerToken, httpClient);
 
         String intruderToken = SignUpAndGetToken(intruderId, httpClient);
-
 
         int status = GetAccountResponse(accountId.toString(), intruderToken, httpClient).status();
         assertThat(status).isEqualTo(HttpStatus.UNAUTHORIZED.value());

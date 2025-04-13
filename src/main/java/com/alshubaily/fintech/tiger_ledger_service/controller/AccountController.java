@@ -1,17 +1,16 @@
 package com.alshubaily.fintech.tiger_ledger_service.controller;
 
 import com.alshubaily.fintech.tiger_ledger_service.model.account.response.*;
-import com.tigerbeetle.*;
 import com.alshubaily.fintech.tiger_ledger_service.service.AccountService;
+import com.tigerbeetle.*;
+import jakarta.validation.constraints.Min;
+import java.math.BigInteger;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import jakarta.validation.constraints.Min;
-
-import java.math.BigInteger;
-import java.util.List;
 
 @Validated
 @RestController
@@ -33,7 +32,8 @@ public class AccountController {
 
     @GetMapping("/{accountId}")
     @PreAuthorize("@authorizationService.hasAccessToAccount(#accountId)")
-    public ResponseEntity<GetAccountResponse> getAccount(@PathVariable @Min(1) BigInteger accountId) throws RequestException {
+    public ResponseEntity<GetAccountResponse> getAccount(@PathVariable @Min(1) BigInteger accountId)
+            throws RequestException {
         return ResponseEntity.ok(accountService.getAccountDetails(accountId));
     }
 }

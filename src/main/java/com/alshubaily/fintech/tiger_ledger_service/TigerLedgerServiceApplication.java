@@ -9,7 +9,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @EnableCaching
 @SpringBootApplication
 public class TigerLedgerServiceApplication {
-	public static void main(String[] args) {
-		SpringApplication.run(TigerLedgerServiceApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(TigerLedgerServiceApplication.class, args);
+    }
 }

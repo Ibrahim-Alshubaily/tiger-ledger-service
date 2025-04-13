@@ -6,12 +6,11 @@ import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.stereotype.Component;
-
 import java.security.Key;
 import java.util.Date;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
 @Component
 public class JwtUtil {
 
@@ -23,9 +22,7 @@ public class JwtUtil {
 
     public JwtUtil(@Value("${jwt.secret:9d7bfd1ba3e236ae73d8c7c3ddef4ad4}") String jwtSecret) {
         this.signingKey = Keys.hmacShaKeyFor(jwtSecret.getBytes());
-        this.jwtParser = Jwts.parser()
-                .setSigningKey(signingKey)
-                .build();
+        this.jwtParser = Jwts.parser().setSigningKey(signingKey).build();
     }
 
     public String generateToken(User user) {

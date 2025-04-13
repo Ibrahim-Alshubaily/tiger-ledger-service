@@ -1,17 +1,16 @@
 package com.alshubaily.fintech.tiger_ledger_service.e2e_test;
 
+import static com.alshubaily.fintech.tiger_ledger_service.util.TestAuthUtil.GetAuthToken;
+import static com.alshubaily.fintech.tiger_ledger_service.util.TestAuthUtil.login;
+import static com.alshubaily.fintech.tiger_ledger_service.util.TestAuthUtil.signup;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.alshubaily.fintech.tiger_ledger_service.model.Auth.request.LoginRequest;
 import com.alshubaily.fintech.tiger_ledger_service.util.*;
+import java.util.UUID;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-
-import java.util.UUID;
-
-import static com.alshubaily.fintech.tiger_ledger_service.util.TestAuthUtil.GetAuthToken;
-import static com.alshubaily.fintech.tiger_ledger_service.util.TestAuthUtil.signup;
-import static com.alshubaily.fintech.tiger_ledger_service.util.TestAuthUtil.login;
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class AuthenticationTests extends BaseE2ETest {
 
@@ -39,7 +38,8 @@ public class AuthenticationTests extends BaseE2ETest {
     void testInvalidLoginUsername() throws Exception {
         String userIdentifier = UUID.randomUUID().toString();
         LoginRequest randomUser = new LoginRequest(userIdentifier, userIdentifier, userIdentifier);
-        assertThat(login(randomUser, httpClient).status()).isEqualTo(HttpStatus.UNAUTHORIZED.value());
+        assertThat(login(randomUser, httpClient).status())
+                .isEqualTo(HttpStatus.UNAUTHORIZED.value());
     }
 
     @Test
@@ -59,5 +59,4 @@ public class AuthenticationTests extends BaseE2ETest {
         HttpRequestUtil.RequestResult response = HttpRequestUtil.execute(httpClient, request);
         assertThat(response.status()).isEqualTo(HttpStatus.UNAUTHORIZED.value());
     }
-
 }

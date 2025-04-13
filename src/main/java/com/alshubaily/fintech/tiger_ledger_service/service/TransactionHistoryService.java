@@ -1,24 +1,24 @@
 package com.alshubaily.fintech.tiger_ledger_service.service;
 
+import static com.alshubaily.fintech.tiger_ledger_service.util.TransactionUtil.getTransactionType;
+
 import com.alshubaily.fintech.tiger_ledger_service.model.transaction.TransactionType;
 import com.alshubaily.fintech.tiger_ledger_service.model.transaction.response.GetTransactionResponse;
 import com.alshubaily.fintech.tiger_ledger_service.util.CurrencyUtil;
 import com.tigerbeetle.*;
-import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.math.BigInteger;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.alshubaily.fintech.tiger_ledger_service.util.TransactionUtil.getTransactionType;
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
 public class TransactionHistoryService {
 
     private final Client client;
+
     public List<GetTransactionResponse> getTransactionHistory(BigInteger accountId) {
         AccountFilter filter = new AccountFilter();
         filter.setAccountId(UInt128.asBytes(accountId));
@@ -33,8 +33,8 @@ public class TransactionHistoryService {
         }
         return resp;
     }
-    private GetTransactionResponse getTransactionResponse(TransferBatch curr) {
 
+    private GetTransactionResponse getTransactionResponse(TransferBatch curr) {
 
         BigInteger debitAccountId = UInt128.asBigInteger(curr.getDebitAccountId());
         BigInteger creditAccountId = UInt128.asBigInteger(curr.getCreditAccountId());
@@ -46,14 +46,13 @@ public class TransactionHistoryService {
             creditAccountId = null;
         }
 
-        GetTransactionResponse transactionResponse =  new GetTransactionResponse(
-                transactionType,
-                debitAccountId,
-                creditAccountId,
-                CurrencyUtil.halalaToSar(curr.getAmount()),
-                Instant.ofEpochSecond(0, curr.getTimestamp())
-        );
-
+        GetTransactionResponse transactionResponse =
+                new GetTransactionResponse(
+                        transactionType,
+                        debitAccountId,
+                        creditAccountId,
+                        CurrencyUtil.halalaToSar(curr.getAmount()),
+                        Instant.ofEpochSecond(0, curr.getTimestamp()));
 
         return transactionResponse;
     }

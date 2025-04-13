@@ -8,8 +8,9 @@ import org.junit.jupiter.api.BeforeAll;
 public abstract class BaseE2ETest {
 
     protected static CloseableHttpClient httpClient;
-    public static final String SERVER_ENDPOINT = System.getenv()
-            .getOrDefault("TIGER_LEDGER_SERVER_BASE_URL", "https://localhost:8443/api/v1");
+    public static final String SERVER_ENDPOINT =
+            System.getenv()
+                    .getOrDefault("TIGER_LEDGER_SERVER_BASE_URL", "https://localhost:8443/api/v1");
 
     @BeforeAll
     static void setupClient() throws Exception {

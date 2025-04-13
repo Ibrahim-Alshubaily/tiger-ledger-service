@@ -1,13 +1,13 @@
 package com.alshubaily.fintech.tiger_ledger_service.e2e_test;
 
-import org.junit.jupiter.api.Test;
-
-import java.util.UUID;
-
 import static com.alshubaily.fintech.tiger_ledger_service.util.TestAccountUtil.*;
 import static com.alshubaily.fintech.tiger_ledger_service.util.TestAuthUtil.SignUpAndGetToken;
 import static com.alshubaily.fintech.tiger_ledger_service.util.TransactionTestUtil.*;
 import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.UUID;
+import org.junit.jupiter.api.Test;
+
 public class TransactionTests extends BaseE2ETest {
 
     @Test
@@ -31,7 +31,6 @@ public class TransactionTests extends BaseE2ETest {
         String token = SignUpAndGetToken(ownerName, httpClient);
 
         String accountId = String.valueOf(CreateAccount(token, httpClient));
-
 
         double preWithdrawBalance = GetAccountBalance(accountId, token, httpClient);
 

@@ -1,10 +1,9 @@
 package com.alshubaily.fintech.tiger_ledger_service.service;
 
 import com.alshubaily.fintech.tiger_ledger_service.util.SecurityUtil;
+import java.math.BigInteger;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
-
-import java.math.BigInteger;
 
 @AllArgsConstructor
 @Component("authorizationService")
@@ -18,4 +17,3 @@ public class AuthorizationService {
         return accountOwnerCacheService.getAccountOwnerId(accountId).equals(currentUserId);
     }
 }
-

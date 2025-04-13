@@ -7,11 +7,12 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Map;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -23,11 +24,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.stereotype.Service;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
 @Configuration
 @AllArgsConstructor
 @EnableMethodSecurity
@@ -35,20 +31,20 @@ public class SecurityConfig {
 
     private JwtAuthFilter jwtAuthFilter;
     private static final String[] PUBLIC_PATHS = {
-            "/api/v1/health",
-            "/api/v1/auth/signup",
-            "/api/v1/auth/login"
+        "/api/v1/health", "/api/v1/auth/signup", "/api/v1/auth/login"
     };
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        return http
-                .csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(PUBLIC_PATHS).permitAll()
-                        .anyRequest().authenticated()
-                )
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        return http.csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(
+                        auth ->
+                                auth.requestMatchers(PUBLIC_PATHS)
+                                        .permitAll()
+                                        .anyRequest()
+                                        .authenticated())
+                .sessionManagement(
+                        session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
@@ -68,9 +64,8 @@ public class SecurityConfig {
         }
 
         @Override
-        protected void doFilterInternal(HttpServletRequest request,
-                                        HttpServletResponse response,
-                                        FilterChain filterChain)
+        protected void doFilterInternal(
+                HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
                 throws ServletException, IOException {
 
             String header = request.getHeader("Authorization");
@@ -83,7 +78,8 @@ public class SecurityConfig {
             try {
                 Claims claims = jwtUtil.validateToken(token);
                 String username = claims.getSubject();
-                Authentication auth = new UsernamePasswordAuthenticationToken(username, claims, null);
+                Authentication auth =
+                        new UsernamePasswordAuthenticationToken(username, claims, null);
                 SecurityContextHolder.getContext().setAuthentication(auth);
             } catch (Exception e) {
                 respondUnauthorized(response, "Invalid or expired token");
@@ -92,7 +88,8 @@ public class SecurityConfig {
             filterChain.doFilter(request, response);
         }
 
-        private void respondUnauthorized(HttpServletResponse response, String message) throws IOException {
+        private void respondUnauthorized(HttpServletResponse response, String message)
+                throws IOException {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json");
             objectMapper.writeValue(response.getWriter(), Map.of("error", message));

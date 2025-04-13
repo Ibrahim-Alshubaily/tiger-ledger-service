@@ -1,9 +1,6 @@
 package com.alshubaily.fintech.tiger_ledger_service.eventbus;
 
-
-
 import com.alshubaily.fintech.tiger_ledger_service.model.transaction.TransactionType;
-
 import java.math.BigInteger;
 import java.sql.Timestamp;
 
@@ -21,5 +18,4 @@ public record TransactionEvent(
         int code,
         int flags,
         Timestamp timestamp,
-        TransactionType transactionType
-) {}
+        TransactionType transactionType) {}

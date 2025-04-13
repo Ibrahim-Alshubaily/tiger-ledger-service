@@ -1,16 +1,15 @@
 package com.alshubaily.fintech.tiger_ledger_service.e2e_test;
 
-import com.alshubaily.fintech.tiger_ledger_service.model.transaction.TransactionType;
-import com.alshubaily.fintech.tiger_ledger_service.model.transaction.response.GetTransactionResponse;
-import org.junit.jupiter.api.Test;
-
-import java.math.BigInteger;
-import java.util.UUID;
-
 import static com.alshubaily.fintech.tiger_ledger_service.util.TestAccountUtil.CreateAccount;
 import static com.alshubaily.fintech.tiger_ledger_service.util.TestAuthUtil.SignUpAndGetToken;
 import static com.alshubaily.fintech.tiger_ledger_service.util.TransactionTestUtil.*;
 import static org.assertj.core.api.Assertions.assertThat;
+
+import com.alshubaily.fintech.tiger_ledger_service.model.transaction.TransactionType;
+import com.alshubaily.fintech.tiger_ledger_service.model.transaction.response.GetTransactionResponse;
+import java.math.BigInteger;
+import java.util.UUID;
+import org.junit.jupiter.api.Test;
 
 class ListTransactionsTest extends BaseE2ETest {
 
@@ -24,15 +23,17 @@ class ListTransactionsTest extends BaseE2ETest {
 
         deposit(amount, accountId.toString(), token, httpClient);
 
-        GetTransactionResponse[] transactions = listTransactions(accountId.toString(), token, httpClient);
+        GetTransactionResponse[] transactions =
+                listTransactions(accountId.toString(), token, httpClient);
         assertThat(transactions).hasSize(1);
-        assertThat(transactions[0]).isEqualTo(new GetTransactionResponse(
-                TransactionType.DEPOSIT,
-                null,
-                accountId,
-                amount,
-                transactions[0].timestamp()
-        ));
+        assertThat(transactions[0])
+                .isEqualTo(
+                        new GetTransactionResponse(
+                                TransactionType.DEPOSIT,
+                                null,
+                                accountId,
+                                amount,
+                                transactions[0].timestamp()));
     }
 
     @Test
@@ -43,15 +44,17 @@ class ListTransactionsTest extends BaseE2ETest {
 
         withdraw(amount, accountId.toString(), token, httpClient);
 
-        GetTransactionResponse[] transactions = listTransactions(accountId.toString(), token, httpClient);
+        GetTransactionResponse[] transactions =
+                listTransactions(accountId.toString(), token, httpClient);
         assertThat(transactions).hasSize(1);
-        assertThat(transactions[0]).isEqualTo(new GetTransactionResponse(
-                TransactionType.WITHDRAW,
-                accountId,
-                null,
-                amount,
-                transactions[0].timestamp()
-        ));
+        assertThat(transactions[0])
+                .isEqualTo(
+                        new GetTransactionResponse(
+                                TransactionType.WITHDRAW,
+                                accountId,
+                                null,
+                                amount,
+                                transactions[0].timestamp()));
     }
 
     @Test
@@ -63,14 +66,16 @@ class ListTransactionsTest extends BaseE2ETest {
 
         transfer(amount, from.toString(), to.toString(), token, httpClient);
 
-        GetTransactionResponse[] transactions = listTransactions(from.toString(), token, httpClient);
+        GetTransactionResponse[] transactions =
+                listTransactions(from.toString(), token, httpClient);
         assertThat(transactions).hasSize(1);
-        assertThat(transactions[0]).isEqualTo(new GetTransactionResponse(
-                TransactionType.TRANSFER,
-                from,
-                to,
-                amount,
-                transactions[0].timestamp()
-        ));
+        assertThat(transactions[0])
+                .isEqualTo(
+                        new GetTransactionResponse(
+                                TransactionType.TRANSFER,
+                                from,
+                                to,
+                                amount,
+                                transactions[0].timestamp()));
     }
 }

@@ -25,5 +25,4 @@ public class CurrencyUtil {
                 .divide(BigDecimal.valueOf(HALALA_PER_SAR), 2, RoundingMode.HALF_UP)
                 .doubleValue();
     }
-
 }

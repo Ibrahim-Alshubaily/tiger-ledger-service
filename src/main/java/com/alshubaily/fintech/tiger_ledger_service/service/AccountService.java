@@ -9,15 +9,14 @@ import com.alshubaily.fintech.tiger_ledger_service.model.account.response.GetAcc
 import com.alshubaily.fintech.tiger_ledger_service.util.CurrencyUtil;
 import com.alshubaily.fintech.tiger_ledger_service.util.SecurityUtil;
 import com.tigerbeetle.*;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
-
 import java.math.BigInteger;
 import java.text.NumberFormat;
 import java.time.Instant;
 import java.util.List;
 import java.util.Locale;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class AccountService {
@@ -29,8 +28,8 @@ public class AccountService {
     private final UserRepository userRepository;
     private final AccountRepository accountRepository;
 
-
-    public AccountService(Client client, UserRepository userRepository, AccountRepository accountRepository) {
+    public AccountService(
+            Client client, UserRepository userRepository, AccountRepository accountRepository) {
         this.client = client;
         this.userRepository = userRepository;
         this.accountRepository = accountRepository;
@@ -47,8 +46,10 @@ public class AccountService {
             throw new Exception("Failed to create account: " + errors.getResult());
         }
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalStateException("User not found: " + userId));
+        User user =
+                userRepository
+                        .findById(userId)
+                        .orElseThrow(() -> new IllegalStateException("User not found: " + userId));
 
         Account account = new Account();
         account.setAccountId(UInt128.asBigInteger(accountId));
@@ -76,11 +77,14 @@ public class AccountService {
     }
 
     public GetAccountResponse getAccountDetails(BigInteger accountId) {
-        Account account = accountRepository.findById(accountId)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Account not found: " + accountId)
-                );
+        Account account =
+                accountRepository
+                        .findById(accountId)
+                        .orElseThrow(
+                                () ->
+                                        new ResponseStatusException(
+                                                HttpStatus.NOT_FOUND,
+                                                "Account not found: " + accountId));
 
         try {
 
@@ -96,23 +100,21 @@ public class AccountService {
             }
 
             batch.next();
-            long balanceHalala = batch.getCreditsPosted().longValue() - batch.getDebitsPosted().longValue();
+            long balanceHalala =
+                    batch.getCreditsPosted().longValue() - batch.getDebitsPosted().longValue();
             double balanceSar = CurrencyUtil.halalaToSar(balanceHalala);
             NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(new Locale("ar", "SA"));
-            String balanceFormatted =  currencyFormat.format(balanceSar);
+            String balanceFormatted = currencyFormat.format(balanceSar);
             return new GetAccountResponse(
                     accountId,
                     balanceFormatted,
                     balanceSar,
                     createdAt,
                     user.getId(),
-                    user.getUsername()
-            );
+                    user.getUsername());
 
         } catch (Exception e) {
             throw new IllegalStateException("Failed to get account: " + e.getMessage(), e);
         }
     }
 }
-
-
