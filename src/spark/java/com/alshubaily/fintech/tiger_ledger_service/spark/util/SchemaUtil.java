@@ -5,7 +5,7 @@ import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.sql.types.StructType;
 
 import java.math.BigInteger;
-import java.time.Instant;
+import java.sql.Timestamp;
 import java.util.Map;
 
 
@@ -17,7 +17,7 @@ public class SchemaUtil {
             Map.entry(Long.class, DataTypes.LongType),
             Map.entry(Integer.TYPE, DataTypes.IntegerType),
             Map.entry(Integer.class, DataTypes.IntegerType),
-            Map.entry(Instant.class, DataTypes.TimestampType)
+            Map.entry(Timestamp.class, DataTypes.TimestampType)
     );
 
     public static StructType schemaFromRecord(Class<?> recordClass) {

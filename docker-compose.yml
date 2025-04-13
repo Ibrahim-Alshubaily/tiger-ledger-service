@@ -85,20 +85,37 @@ services:
     networks:
       - tiger-network
 
-  spark-streaming-job:
+  spark-metrics-stream:
     build:
       context: .
       dockerfile: docker/spark/Dockerfile
-    container_name: spark-streaming-job
+    container_name: spark-metrics-stream
+    ports:
+      - "9095:9095"
     depends_on:
       - kafka
     networks:
       - tiger-network
 
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    networks:
+      - tiger-network
+    depends_on:
+      - spark-metrics-stream
+    restart: unless-stopped
+
 volumes:
   tigerbeetle-data:
   pgdata:
   kafka-data:
+  prometheus-data:
 
 networks:
   tiger-network:

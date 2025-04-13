@@ -4,20 +4,20 @@ import com.alshubaily.fintech.tiger_ledger_service.eventbus.KafkaEventPublisher;
 import com.alshubaily.fintech.tiger_ledger_service.eventbus.TransactionEvent;
 import com.alshubaily.fintech.tiger_ledger_service.model.transaction.TransactionType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.tigerbeetle.TransferBatch;
 import com.tigerbeetle.UInt128;
 import org.springframework.scheduling.annotation.Async;
 
 import java.math.BigInteger;
-import java.time.Instant;
+import java.sql.Timestamp;
 
 import static com.alshubaily.fintech.tiger_ledger_service.service.AccountService.CASH_ACCOUNT_ID;
 
 public class TransactionUtil {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
-            .registerModule(new JavaTimeModule());
+            .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
     public static TransactionType getTransactionType(BigInteger debitAccountId, BigInteger creditAccountId) {
         if (CASH_ACCOUNT_ID.equals(debitAccountId)) {
@@ -53,7 +53,7 @@ public class TransactionUtil {
                 transfers.getLedger(),
                 transfers.getCode(),
                 transfers.getFlags(),
-                Instant.ofEpochSecond(0, transfers.getTimestamp()),
+                new Timestamp(System.currentTimeMillis()),
                 getTransactionType(debitAccountId, creditAccountId)
         );
 
